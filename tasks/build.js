@@ -26,7 +26,6 @@ module.exports = function (grunt) {
     'clean:test_from_node_modules',
     'download_node_binaries',
     'copy:versioned_dist',
-    'create_services',
     'create_packages',
     'create_shasums'
   ]);
