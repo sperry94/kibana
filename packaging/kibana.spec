@@ -31,8 +31,6 @@ source %_builddir/%{name}/nvm/nvm.sh
 nvm install "$(cat .node-version)"
 #install all of the dependencies
 npm install
-npm install -g grunt-cli
-npm install grunt --save-dev
 %build
 #run the build
 cd %{name}
