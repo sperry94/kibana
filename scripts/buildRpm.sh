@@ -2,7 +2,7 @@
 set -e
 PACKAGE=kibana
 GIT_VERSION=`git rev-list --branches HEAD | wc -l`
-GIT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+GIT_BRANCH="4.1.4"
 VERSION="$GIT_BRANCH.$GIT_VERSION"
 
 PWD=`pwd`
