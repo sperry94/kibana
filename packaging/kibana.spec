@@ -43,6 +43,8 @@ mkdir -p %{buildroot}/usr/local/www/probe/
 mkdir -p %{buildroot}/etc/init
 tar xvf target/%{name}-%{kibana_version}-linux-x64.tar.gz -C %{buildroot}/usr/local/www/probe/
 cp init/kibana.conf %{buildroot}/etc/init
+cp -r dashboards/ %{buildroot}/usr/local/www/probe
+
 %post
 
 %postun
@@ -50,4 +52,5 @@ cp init/kibana.conf %{buildroot}/etc/init
 %files
 %defattr(-,nginx,nginx,-)
 /usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
+/usr/local/www/probe/dashboards/*.json
 %attr(0644,root,root) /etc/init/kibana.conf
