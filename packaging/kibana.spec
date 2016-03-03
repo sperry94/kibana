@@ -41,13 +41,18 @@ cd %{name}
 #extract the built tarball to the www location
 mkdir -p %{buildroot}/usr/local/www/probe/
 mkdir -p %{buildroot}/etc/init
-tar xvf target/%{name}-%{kibana_version}-linux-x64.tar.gz -C %{buildroot}/usr/local/www/probe/
+tar xvf target/%{name}-%{kibana_version}-linux-x64.tar.gz -C %{buildroot}/usr/local/
 cp init/kibana.conf %{buildroot}/etc/init
-%post
 
+%post
+link=/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
+if [ ! -L $link ]; then
+   ln -s /usr/local/%{name}-%{kibana_version}-linux-x64 $link
+   sudo chown -R  nginx:nginx $link
+fi
 %postun
 
 %files
 %defattr(-,nginx,nginx,-)
-/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
+/usr/local/%{name}-%{kibana_version}-linux-x64
 %attr(0644,root,root) /etc/init/kibana.conf
