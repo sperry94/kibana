@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+#
+# NEVER RUN THIS SCRIPT DIRECTLY. IT SHOULD ONLY BE CALLED BY kibana.spec
+#
+
+
+
 { # this ensures the entire script is downloaded #
 
 nvm_has() {
