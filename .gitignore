@@ -6,7 +6,6 @@ bower_components
 **/*.css
 trash
 build
-target
 .jruby
 .idea
 *.iml
