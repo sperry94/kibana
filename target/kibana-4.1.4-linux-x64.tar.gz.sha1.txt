@@ -1,1 +1,1 @@
-825de29db3418f9f6e95edb3f46ee6b7c5e59f28  kibana-4.1.4-linux-x64.tar.gz
+42768f3137c5a4ea22c1c58b74e47df23a3e9e43  kibana-4.1.4-linux-x64.tar.gz
