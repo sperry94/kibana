@@ -7,9 +7,11 @@ INDEX_PATTERN="{\"title\": \"network_*\", \"timeFieldName\": \"@TimeUpdated\", \
 DEFAULT_INDEX="{\"doc\":{\"doc\":{\"defaultIndex\":\"network_*\"},\"defaultIndex\":\"network_*\"}}"
 JSON_FLAG="-d"
 
-echo "START"
+# Create the index pattern and specify TimeUpdated as the default time parameter
 curl -XPOST localhost:9200/.kibana/index-pattern/network_*/?op_type=create -d "$INDEX_PATTERN"
-echo "CREATED"
+
+# Check to see if the kibana/config index exists already
+#   If it does not, create it before updating it
 config_exists=$(curl "$XHEAD_PARAMS" -XHEAD "$KIBANA_PREFIX"/config | grep -i "$NOT_FOUND")
 if [ $? == 0  ]; then
    echo "Config record DOES NOT exist"
@@ -18,7 +20,5 @@ else
    echo "Config record DOES exist"
 fi
 
-echo "Config should exist at this point"
+# Update the config so that the network_* index pattern is set as the default index
 curl -XPOST "$KIBANA_PREFIX"/config/4.1.4/_update "$JSON_FLAG" "$DEFAULT_INDEX"
-
-echo "END"
