@@ -8,7 +8,7 @@ DEFAULT_INDEX="{\"doc\":{\"doc\":{\"defaultIndex\":\"network_*\"},\"defaultIndex
 JSON_FLAG="-d"
 
 # Create the index pattern and specify TimeUpdated as the default time parameter
-curl -XPOST localhost:9200/.kibana/index-pattern/network_*/?op_type=create -d "$INDEX_PATTERN"
+curl -XPOST "$KIBANA_PREFIX"/index-pattern/network_*/?op_type=create -d "$INDEX_PATTERN"
 
 # Check to see if the kibana/config index exists already
 #   If it does not, create it before updating it
