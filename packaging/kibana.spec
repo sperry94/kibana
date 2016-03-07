@@ -25,7 +25,7 @@ fi
 sed -i s/\'shasum/\'sha1sum/g tasks/create_shasums.js
 sed -i s/0.10.x/0.10.42/g .node-version
 #ensure nvm is installed
-NVM_DIR="%_builddir/%{name}/nvm" bash scripts/install_nvm.sh
+NVM_DIR="%_builddir/%{name}/nvm" bash scripts/kibanaSpecHelper_install_nvm.sh
 source %_builddir/%{name}/nvm/nvm.sh
 #install the correct node version locally
 nvm install "$(cat .node-version)"
