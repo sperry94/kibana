@@ -10,6 +10,14 @@ define(function (require) {
   require('components/notify/notify');
   require('components/typeahead/typeahead');
   require('components/clipboard/clipboard');
+  require('plugins/dashboard/components/modal/validators');
+  require('angular-bootstrap');
+  
+  // NetMon Non-Kibana Libraries 
+  require('/analyze/common/lib/ui-utils.min.js');
+  require('/analyze/common/lib/elastic-angular-client.js');
+  require('/analyze/common/lib/elastic.min.js');
+  //require('/analyze/common/lib/restangular.min.js');
 
 
   require('plugins/dashboard/directives/grid');
@@ -23,7 +31,10 @@ define(function (require) {
     'kibana/courier',
     'kibana/config',
     'kibana/notify',
-    'kibana/typeahead'
+    'kibana/typeahead',
+    'ui.bootstrap',
+    'ui.validate',
+    'elasticjs.service'
   ]);
 
   require('routes')
@@ -49,7 +60,7 @@ define(function (require) {
 
   app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter, kbnUrl) {
     return {
-      controller: function ($scope, $route, $routeParams, $location, configFile, Private, getAppState) {
+      controller: function ($scope, $route, $routeParams, $location, $http, configFile, Private, getAppState, $modal) {
         var queryFilter = Private(require('components/filter_bar/query_filter'));
 
         var notify = new Notifier({
@@ -200,11 +211,100 @@ define(function (require) {
             };
           }
         };
+        
+        $scope.openSaveRuleModal = function (query) {
+      
+           var modalInstance = $modal.open({
+              animation: $scope.animationsEnabled,
+              templateUrl: 'plugins/dashboard/components/modal/save-rule.html',
+              controller: 'SaveRuleController',
+              resolve: {
+               query: function () {
+                  return query;
+               }
+              }
+           });
+      
+           modalInstance.result.then(function (selectedItem) {
+              $scope.selected = selectedItem;
+           }, function () {
+              console.log('Modal dismissed at: ' + new Date());
+           });
+      };
 
         init();
       }
     };
   });
+  
+  app.controller('SaveRuleController', function ($scope, $modalInstance, $http, query, formValidators) {
+      $scope.init = function(query){
+         $scope.validators = formValidators;
+         console.log($scope.validators);
+         $scope.savableRule = {
+            state: 'unsaved'
+         };
+
+         if (query.query_string.query && query.query_string.query !== '*') {
+            $scope.savableRule.queryObj = query;
+            $scope.savableRule.query = query.query_string.query;
+         }
+      };
+      
+      $scope.init(query);
+      
+       $scope.cancel = function () {
+          $modalInstance.dismiss('cancel');
+       };
+
+      $scope.openConfirmSaveRuleModal = function(rule, form) {
+
+         // console.log('invalid?', saveRuleForm.$invalid);
+         // $scope.savableRule.state = 'unconfirmed';
+         // $scope.savableRule.loading = true;
+         // 
+         // form.$setPristine();
+         // $scope.savableRule.numMatches = 999;
+         $modalInstance.close('test');
+         // here's where we get the number of hits in the past day
+         // lets do this on the backend 
+
+      };
+
+      $scope.saveRule = function(rule) {
+
+         rule.loading = true;
+         // Restangular
+         //    .all('rules/')
+         //    .post({
+         //       name: rule.name,
+         //       enabled: true,
+         //       severity: rule.severity,
+         //       query: JSON.parse(query.toString())
+         //    })
+         //    .then(
+         //       function(data) {
+         //         if (!data.error){
+         //           $scope.savableRule = angular.copy(data);
+         //           $scope.savableRule.state = 'saved';
+         //           $scope.savableRule.loading = false;
+         //         } else{
+         //           $scope.savableRule = {
+         //                 loading: false,
+         //                 state: 'error',
+         //                 error: data.message
+         //           };
+         //         }
+         //       },
+         //      function() {
+         //         $scope.savableRule = {
+         //            loading: false,
+         //            state: 'error',
+         //            error: 'There was a problem saving your rule.'
+         //         };
+         //    });
+         };
+    });
 
   var apps = require('registry/apps');
   apps.register(function DashboardAppModule() {

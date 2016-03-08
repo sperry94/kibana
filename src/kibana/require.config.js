@@ -37,7 +37,8 @@ require.config({
     zeroclipboard: 'bower_components/zeroclipboard/dist/ZeroClipboard',
     marked: 'bower_components/marked/lib/marked',
     numeral: 'bower_components/numeral/numeral',
-    semver: 'bower_components/semver/semver.browser'
+    semver: 'bower_components/semver/semver.browser',
+    restangular: '/analyze/common/lib/restangular.min'
   },
   shim: {
     angular: {
@@ -66,7 +67,10 @@ require.config({
     },
     marked: {
       exports: 'marked'
-    }
+   },
+   restangular: {
+      deps: ['lodash', 'angular']
+   },
   },
   waitSeconds: 60
 });
