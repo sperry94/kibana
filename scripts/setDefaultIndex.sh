@@ -2,7 +2,7 @@
 
 KIBANA_PREFIX="localhost:9200/.kibana"
 INDEX_PATTERN="/index-pattern/network_*"
-INDEX_PATTERN_SPEC="{\"title\": \"network_*\", \"timeFieldName\": \"@TimeUpdated\", \"customFormats\": {}}"
+INDEX_PATTERN_SPEC="{\"title\": \"network_*\", \"timeFieldName\": \"TimeUpdated\", \"customFormats\": {}}"
 DEFAULT_INDEX="{\"defaultIndex\":\"network_*\"}"
 VER="4.1.4"
 CONFIG="/config/$VER"
