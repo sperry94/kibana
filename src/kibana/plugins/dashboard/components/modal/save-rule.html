@@ -20,7 +20,7 @@
       </div>
       <div class="modal-footer">
          <button class="btn btn-primary" type="button" ng-click="saveRule(savableRule)" ng-if="!savableRule.id && !savableRule.loading">Confirm</button>
-         <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+         <button class="btn btn-default" type="button" ng-click="cancel()">Cancel</button>
       </div>
    </div>
 
@@ -71,7 +71,7 @@
          </div>
       </div>
       <div class="modal-body" ng-if="!savableRule.loading">
-         <form name="saveRuleForm" class="form-horizontal">
+         <form name="$parent.saveRuleForm" class="form-horizontal">
             <input type="hidden" name="enabled" ng-model="savableRule.enabled" />
             <div class="form-group">
                <label 

@@ -36,7 +36,7 @@ define(function (require) {
                   .one('rules/')
                   .get({ name: value })
                   .then(function(rule) {
-                     if (!rule || !rule.error || !rule.id) {
+                     if (!rule || rule.error || !rule.id) {
                         deferred.resolve();
                      } else {
                         deferred.reject();
