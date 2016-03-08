@@ -1,8 +1,15 @@
 #!/bin/bash
 set -e
+set -x
+
+if [[ $# -ne 1 ]] ; then
+    echo 'Usage:  sh buildRpm <BRANCH> '
+    exit 0
+fi
+
 PACKAGE=kibana
 GIT_VERSION=`git rev-list --branches HEAD | wc -l`
-GIT_BRANCH="4.1.4"
+GIT_BRANCH="$1"
 VERSION="$GIT_BRANCH.$GIT_VERSION"
 
 PWD=`pwd`
