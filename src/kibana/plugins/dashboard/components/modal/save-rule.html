@@ -14,7 +14,7 @@
          <div class="row">
             <div class="span12">
                <p>In the last 24 hours, this rule would have triggered <strong>{{ savableRule.numMatches | number }}</strong> time(s).</p>
-               <p>Are you sure you want to {{ savableRule.id ? 'update' : 'create' }} the rule "{{ savableRule.name }}"?</p>
+               <p>Are you sure you want to create the rule {{ savableRule.name }}?</p>
             </div>
          </div>
       </div>
@@ -38,7 +38,7 @@
          Rule saved successfully.
       </div>
       <div class="modal-footer">
-         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+         <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
       </div>
    </div>
 
@@ -56,11 +56,12 @@
          {{ savableRule.error }}
       </div>
       <div class="modal-footer">
-         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+         <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
       </div>
    </div>
 
    <!-- Save form -->
+   <div ng-switch-default>
       <div class="modal-header">
          <h3>Create Rule</h3>
       </div>
@@ -70,7 +71,7 @@
          </div>
       </div>
       <div class="modal-body" ng-if="!savableRule.loading">
-         <form name="saveRuleForm" class="form-horizontal" ng-switch-default>
+         <form name="saveRuleForm" class="form-horizontal">
             <input type="hidden" name="enabled" ng-model="savableRule.enabled" />
             <div class="form-group">
                <label 
@@ -122,11 +123,11 @@
             </div>
          </div>
       </form>
-      </div>
       <div class="modal-footer">
          <button class="btn btn-primary" type="button" ng-click="openConfirmSaveRuleModal(savableRule, saveRuleForm)" ng-disabled="saveRuleForm.$invalid">Save</button>
          <button class="btn btn-default" type="button" ng-click="cancel()">Close</button>
       </div>
+    </div>
 
 
 </div>

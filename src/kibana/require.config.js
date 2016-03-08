@@ -38,7 +38,9 @@ require.config({
     marked: 'bower_components/marked/lib/marked',
     numeral: 'bower_components/numeral/numeral',
     semver: 'bower_components/semver/semver.browser',
-    restangular: '/analyze/common/lib/restangular.min'
+    
+    // Libraries Installed through NetMon
+    restangular: '/analyze/common/lib/restangular.min',
   },
   shim: {
     angular: {

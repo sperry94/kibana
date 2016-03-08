@@ -1,3 +1,7 @@
+/* This file is a duplicate of /www/probe/analyze/js/services/formValidators.js
+* TODO: figure out a way to share angular modules
+*  between Kibana and NetMon
+*/
 define(function (require) {
    
   var app = require('modules').get('app/dashboard');
@@ -8,10 +12,7 @@ define(function (require) {
         hasErrors: function(formCtrl) {
             return !formCtrl.$pristine && !formCtrl.$valid;
          },
-         showError: function(formCtrl, field) {
-            if (!formCtrl.$pristine && !!formCtrl.$error[field]) { 
-               console.log('should show error');
-            }     
+         showError: function(formCtrl, field) {  
             return !formCtrl.$pristine && !!formCtrl.$error[field];
          },
          required: function(value) {
@@ -21,7 +22,6 @@ define(function (require) {
             return !this.required(value) || /^[\w\-\s]+$/.test(value);
          },
          uniqueRule: function(value, ruleId) {
-            console.log('unique rule');
             var deferred = $q.defer();
 
             if (!this.required(value) || value === ruleId) {
@@ -78,7 +78,6 @@ define(function (require) {
                   deferred.reject
                );
             }, 500);
-            console.log(deferred.promise);
             return deferred.promise;
       }
      };

@@ -10,14 +10,13 @@ define(function (require) {
   require('components/notify/notify');
   require('components/typeahead/typeahead');
   require('components/clipboard/clipboard');
-  require('plugins/dashboard/components/modal/validators');
+  require('plugins/dashboard/components/modal/modal');
   require('angular-bootstrap');
   
   // NetMon Non-Kibana Libraries 
   require('/analyze/common/lib/ui-utils.min.js');
   require('/analyze/common/lib/elastic-angular-client.js');
   require('/analyze/common/lib/elastic.min.js');
-  //require('/analyze/common/lib/restangular.min.js');
 
 
   require('plugins/dashboard/directives/grid');
@@ -224,12 +223,6 @@ define(function (require) {
                }
               }
            });
-      
-           modalInstance.result.then(function (selectedItem) {
-              $scope.selected = selectedItem;
-           }, function () {
-              console.log('Modal dismissed at: ' + new Date());
-           });
       };
 
         init();
@@ -237,75 +230,6 @@ define(function (require) {
     };
   });
   
-  app.controller('SaveRuleController', function ($scope, $modalInstance, $http, query, formValidators) {
-      $scope.init = function(query){
-         $scope.validators = formValidators;
-         console.log($scope.validators);
-         $scope.savableRule = {
-            state: 'unsaved'
-         };
-
-         if (query.query_string.query && query.query_string.query !== '*') {
-            $scope.savableRule.queryObj = query;
-            $scope.savableRule.query = query.query_string.query;
-         }
-      };
-      
-      $scope.init(query);
-      
-       $scope.cancel = function () {
-          $modalInstance.dismiss('cancel');
-       };
-
-      $scope.openConfirmSaveRuleModal = function(rule, form) {
-
-         // console.log('invalid?', saveRuleForm.$invalid);
-         // $scope.savableRule.state = 'unconfirmed';
-         // $scope.savableRule.loading = true;
-         // 
-         // form.$setPristine();
-         // $scope.savableRule.numMatches = 999;
-         $modalInstance.close('test');
-         // here's where we get the number of hits in the past day
-         // lets do this on the backend 
-
-      };
-
-      $scope.saveRule = function(rule) {
-
-         rule.loading = true;
-         // Restangular
-         //    .all('rules/')
-         //    .post({
-         //       name: rule.name,
-         //       enabled: true,
-         //       severity: rule.severity,
-         //       query: JSON.parse(query.toString())
-         //    })
-         //    .then(
-         //       function(data) {
-         //         if (!data.error){
-         //           $scope.savableRule = angular.copy(data);
-         //           $scope.savableRule.state = 'saved';
-         //           $scope.savableRule.loading = false;
-         //         } else{
-         //           $scope.savableRule = {
-         //                 loading: false,
-         //                 state: 'error',
-         //                 error: data.message
-         //           };
-         //         }
-         //       },
-         //      function() {
-         //         $scope.savableRule = {
-         //            loading: false,
-         //            state: 'error',
-         //            error: 'There was a problem saving your rule.'
-         //         };
-         //    });
-         };
-    });
-
   var apps = require('registry/apps');
   apps.register(function DashboardAppModule() {
     return {
