@@ -13,7 +13,7 @@ CREATE="/_create"
 JSON_FLAG="-d"
 XHEAD_PARAMS="-i"
 
-KIBANA_LOG_FILE="/tmp/KibanaStartup.log"
+KIBANA_LOG_FILE="/var/log/probe/KibanaStartup.log"
 
 if [ ! -e $KIBANA_LOG_FILE ]; then
    touch $KIBANA_LOG_FILE
