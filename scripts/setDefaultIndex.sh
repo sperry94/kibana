@@ -25,10 +25,7 @@ fi
 config_exists=$(curl "$XHEAD_PARAMS" -XHEAD "$KIBANA_PREFIX""$CONFIG" | grep -i "$NOT_FOUND")
 if [ $? == 0  ]; then
    echo "Config record DOES NOT exist"
-   curl -XPUT "$KIBANA_PREFIX""$CONFIG""$CREATE" "$JSON_FLAG" "$DEFAULT_INDEX"
+   curl -XPOST "$KIBANA_PREFIX""$CONFIG""$CREATE" "$JSON_FLAG" "$DEFAULT_INDEX"
 else
    echo "Config record DOES exist"
 fi
-
-# Update the config so that the network_* index pattern is set as the default index
-#curl -XPOST "$KIBANA_PREFIX"/config/4.1.4/_update "$JSON_FLAG" "$DEFAULT_INDEX"
