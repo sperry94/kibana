@@ -34,7 +34,7 @@ cp -r dashboards/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 cp -r visualizations/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 cp -r searches/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 cp scripts/setDefaultIndex.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
-cp scripts/load_dashboards.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
+cp scripts/loadAssets.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 
 %post
 link=/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
