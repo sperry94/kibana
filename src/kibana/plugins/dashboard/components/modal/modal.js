@@ -37,7 +37,6 @@ define(function (require) {
 
             $scope.savableRule.state = 'unconfirmed';
             $scope.savableRule.loading = true;
-            console.log('form', form);
             form.$setPristine();
 
             kbnIndex.indices(from, to, '[network_]YYYY_MM_DD', 'day')

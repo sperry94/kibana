@@ -41,6 +41,9 @@ require.config({
     
     // Libraries Installed through NetMon
     restangular: '/analyze/common/lib/restangular.min',
+    'ui-util' : '/analyze/common/lib/ui-utils.min',
+    'elasticjs-angular' : '/analyze/common/lib/elastic-angular-client',
+     elasticjs : '/analyze/common/lib/elastic.min'
   },
   shim: {
     angular: {
@@ -73,6 +76,10 @@ require.config({
    restangular: {
       deps: ['lodash', 'angular']
    },
+   elasticjs: {
+       
+   }
+   
   },
   waitSeconds: 60
 });

@@ -14,9 +14,9 @@ define(function (require) {
   require('angular-bootstrap');
   
   // NetMon Non-Kibana Libraries 
-  require('/analyze/common/lib/ui-utils.min.js');
-  require('/analyze/common/lib/elastic-angular-client.js');
-  require('/analyze/common/lib/elastic.min.js');
+  require('ui-util');
+  require('elasticjs');
+  require('elasticjs-angular');
 
 
   require('plugins/dashboard/directives/grid');
