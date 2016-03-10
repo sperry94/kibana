@@ -4,7 +4,7 @@
 */
 define(function (require) {
     var _ = require('lodash');
-    require('/skin/js/fieldMap.js');
+    require('fieldmap');
     var app = require('modules').get('app/dashboard');
     app.factory('elasticSearchFields', function() {
           var DEFAULT_TYPE = 'networkData',
