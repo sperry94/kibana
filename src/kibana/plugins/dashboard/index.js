@@ -10,6 +10,13 @@ define(function (require) {
   require('components/notify/notify');
   require('components/typeahead/typeahead');
   require('components/clipboard/clipboard');
+  require('plugins/dashboard/components/modal/modal');
+  require('angular-bootstrap');
+  
+  // NetMon Non-Kibana Libraries 
+  require('ui-util');
+  require('elasticjs');
+  require('elasticjs-angular');
 
 
   require('plugins/dashboard/directives/grid');
@@ -23,7 +30,10 @@ define(function (require) {
     'kibana/courier',
     'kibana/config',
     'kibana/notify',
-    'kibana/typeahead'
+    'kibana/typeahead',
+    'ui.bootstrap',
+    'ui.validate',
+    'elasticjs.service'
   ]);
 
   require('routes')
@@ -49,7 +59,7 @@ define(function (require) {
 
   app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter, kbnUrl) {
     return {
-      controller: function ($scope, $route, $routeParams, $location, configFile, Private, getAppState) {
+      controller: function ($scope, $route, $routeParams, $location, $http, configFile, Private, getAppState, $modal) {
         var queryFilter = Private(require('components/filter_bar/query_filter'));
 
         var notify = new Notifier({
@@ -200,12 +210,26 @@ define(function (require) {
             };
           }
         };
+        
+        $scope.openSaveRuleModal = function (query) {
+      
+           var modalInstance = $modal.open({
+              animation: $scope.animationsEnabled,
+              templateUrl: 'plugins/dashboard/components/modal/save-rule.html',
+              controller: 'SaveRuleController',
+              resolve: {
+               query: function () {
+                  return query;
+               }
+              }
+           });
+      };
 
         init();
       }
     };
   });
-
+  
   var apps = require('registry/apps');
   apps.register(function DashboardAppModule() {
     return {
