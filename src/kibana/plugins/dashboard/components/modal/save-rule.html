@@ -11,12 +11,8 @@
          </div>
       </div>
       <div class="modal-body" ng-if="!savableRule.loading">
-         <div class="row">
-            <div class="span12">
-               <p>In the last 24 hours, this rule would have triggered <strong>{{ savableRule.numMatches | number }}</strong> time(s).</p>
-               <p>Are you sure you want to create the rule {{ savableRule.name }}?</p>
-            </div>
-         </div>
+       <p>In the last 24 hours, this rule would have triggered <strong>{{ savableRule.numMatches | number }}</strong> time(s).</p>
+       <p>Are you sure you want to create the rule {{ savableRule.name }}?</p>
       </div>
       <div class="modal-footer">
          <button class="btn btn-primary-orig" type="button" ng-click="saveRule(savableRule)" ng-if="!savableRule.id && !savableRule.loading">Confirm</button>
