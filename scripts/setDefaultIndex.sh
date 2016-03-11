@@ -56,7 +56,7 @@ config_has_default_index=$?
 if [ $config_has_default_index != 0 ]; then
    echo `date +'%D %T'` "    Config for $VER exists, but no default index is specified"      >> $KIBANA_LOG_FILE
    echo `date +'%D %T'` "    Updating config/$VER record with default index \"network_*\""   >> $KIBANA_LOG_FILE
-   curl -XPOST "$KIBANA_PREFIX""$CONFIG""$UPDATE" "$JSON_FLAG" \'{\"doc\": $DEFAULT_INDEX}\' >> $KIBANA_LOG_FILE
+   curl -XPOST "$KIBANA_PREFIX""$CONFIG""$UPDATE" "$JSON_FLAG" "{\"doc\": $DEFAULT_INDEX}"   >> $KIBANA_LOG_FILE
    echo `date +'%D %T'` "    Result of -> curl -XGET $KIBANA_PREFIX$CONFIG$PRETTY:"          >> $KIBANA_LOG_FILE
    curl -XGET "$KIBANA_PREFIX""$CONFIG""$PRETTY"                                             >> $KIBANA_LOG_FILE
 else
