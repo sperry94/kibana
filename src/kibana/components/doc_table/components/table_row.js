@@ -9,6 +9,7 @@ define(function (require) {
   require('components/doc_viewer/doc_viewer');
   require('filters/trust_as_html');
   require('filters/short_dots');
+  require('netmon_libs/custom_modules/table_row/services/downloadButtonService');
 
 
   // guesstimate at the minimum number of chars wide cells in the table should be
@@ -22,7 +23,7 @@ define(function (require) {
    * <tr ng-repeat="row in rows" kbn-table-row="row"></tr>
    * ```
    */
-  module.directive('kbnTableRow', function ($compile) {
+  module.directive('kbnTableRow', function ($compile, DownloadButtonService) {
     var noWhiteSpace = require('utils/no_white_space');
     var openRowHtml = require('text!components/doc_table/components/table_row/open.html');
     var detailsHtml = require('text!components/doc_table/components/table_row/details.html');
@@ -105,13 +106,14 @@ define(function (require) {
           }
 
           $scope.columns.forEach(function (column) {
-            newHtmls.push(cellTemplate({
-              timefield: false,
-              sourcefield: (column === '_source'),
-              formatted: _displayField(row, column, true)
-            }));
+              var templ = cellTemplate({
+                timefield: false,
+                sourcefield: (column === '_source'),
+                formatted: _displayField(row, column, true)
+            });
+            newHtmls.push($compile(templ)($scope));
           });
-
+          
           var $cells = $el.children();
           newHtmls.forEach(function (html, i) {
             var $cell = $cells.eq(i);
@@ -120,7 +122,6 @@ define(function (require) {
             var reuse = _.find($cells.slice(i + 1), function (cell) {
               return $.data(cell, 'discover:html') === html;
             });
-
             var $target = reuse ? $(reuse).detach() : $(html);
             $target.data('discover:html', html);
             var $before = $cells.eq(i - 1);
@@ -153,18 +154,21 @@ define(function (require) {
         function _displayField(row, fieldName, breakWords) {
           var indexPattern = $scope.indexPattern;
           var text = indexPattern.formatField(row, fieldName);
-
+          var downloadButton = DownloadButtonService.getButtonType();
           if (breakWords) {
             text = addWordBreaks(text, MIN_LINE_LENGTH);
 
             if (text.length > MIN_LINE_LENGTH) {
-              return truncateByHeightTemplate({
-                body: text
-              });
+                text =  truncateByHeightTemplate({
+                      body: text
+                });
             }
           }
 
-          return text;
+          return {
+              text : text,
+              downloadButton : downloadButton 
+          };
         }
 
         init();
