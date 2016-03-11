@@ -24,7 +24,6 @@ define(function (require) {
         };
         return {
             logQuery : function(query, from, to) {
-                console.log('trying to log query from logQuery');
                 query = formatQuery(query)[0];
 
                 if (!from || !to || 

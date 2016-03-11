@@ -63,7 +63,6 @@ define(function (require) {
         return {
           link: function(scope, elem) {
               elem.on('submit', function() {
-                  console.log('about to log query:  ' + scope.state.query['query_string']['query'] + ' from: ' + scope.timefilter.time.from + ' to: ' + scope.timefilter.time.to);
                   searchAuditor.logQuery(scope.state.query['query_string']['query'],
                                          datemath.parse(scope.timefilter.time.from),
                                          datemath.parse(scope.timefilter.time.to));
