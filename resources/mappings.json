@@ -1,0 +1,12 @@
+{
+   "doc":{
+      "fieldFormatMap": {
+         "Duration": {
+            "id":"number",
+               "params": {
+                  "pattern":"00:00:00"
+               }
+         }
+      }
+   }
+}
