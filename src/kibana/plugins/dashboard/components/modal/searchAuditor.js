@@ -23,14 +23,14 @@ define(function (require) {
             return _query;
         };
         return {
+            autoCapQuery : function(query) {
+                return formatQuery(query)[0];
+            },
             logQuery : function(query, from, to) {
-                query = formatQuery(query)[0];
-
                 if (!from || !to || 
                     query === "" || 
                     query === "*" || 
                     query === "+Captured:true") {
-                    console.log("weird thing, query: " + query);
                     return;
                 }
                 var formatString = "YYYY/MM/DD HH:mm:ss";
