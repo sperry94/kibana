@@ -63,6 +63,14 @@ define(function (require) {
         return {
           link: function(scope, elem) {
               elem.on('submit', function() {
+                  // TODO: find what event kibana4 uses for searches to listen instead
+                  scope.state.query =
+                      {
+                          query_string : {
+                              query : searchAuditor.autoCapQuery(scope.state.query['query_string']['query'])
+                          }
+                      };
+                  scope.filterResults();
                   searchAuditor.logQuery(scope.state.query['query_string']['query'],
                                          datemath.parse(scope.timefilter.time.from),
                                          datemath.parse(scope.timefilter.time.to));
