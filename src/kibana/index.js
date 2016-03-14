@@ -3,7 +3,7 @@
  */
 define(function (require) {
   var angular = require('angular');
-  var _ = require('lodash');
+  var _ = window._ || require('lodash');
   var $ = require('jquery');
   var modules = require('modules');
   var routes = require('routes');
@@ -11,6 +11,8 @@ define(function (require) {
   require('elasticsearch');
   require('angular-route');
   require('angular-bindonce');
+  
+  require('restangular');
 
   var configFile = JSON.parse(require('text!config'));
 
@@ -19,7 +21,8 @@ define(function (require) {
     'elasticsearch',
     'pasvaz.bindonce',
     'ngRoute',
-    'ngClipboard'
+    'ngClipboard',
+    'restangular'
   ]);
 
 
@@ -39,6 +42,24 @@ define(function (require) {
     .constant('sessionId', Date.now())
     // attach the route manager's known routes
     .config(routes.config)
+    .config(function(RestangularProvider) {
+      RestangularProvider.setBaseUrl('/data/api');
+      RestangularProvider.setDefaultHeaders({
+         'Cache-Control': 'no-cache, no-store, must-revalidate',
+         'Pragma': 'no-cache',
+         'Expires': 0
+      });
+      RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
+         // TODO: standardized error handling - right now we soft fail errors to empty data
+      
+         // Redirect API login failure response to login page
+         if (data.status !== 'success' && data.message && data.message.match(/you must be logged in/gi)) {
+            location.href = '/login.php';
+         }
+      
+         return data && data.status === 'success' ? data.data : {error: true, message: data.message};
+      });
+   })
     .config(['ngClipProvider', function (ngClipProvider) {
       ngClipProvider.setPath('bower_components/zeroclipboard/dist/ZeroClipboard.swf');
     }]);
