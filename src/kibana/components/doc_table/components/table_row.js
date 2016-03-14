@@ -154,7 +154,7 @@ define(function (require) {
         function _displayField(row, fieldName, breakWords) {
           var indexPattern = $scope.indexPattern;
           var text = indexPattern.formatField(row, fieldName);
-          var downloadButton = DownloadButtonService.getButtonType();
+          var downloadButton = DownloadButtonService.getButtonType(row, fieldName);
           if (breakWords) {
             text = addWordBreaks(text, MIN_LINE_LENGTH);
 
