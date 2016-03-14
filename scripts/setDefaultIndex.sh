@@ -17,25 +17,9 @@ XHEAD_PARAMS="-i"
 
 KIBANA_LOG_FILE="/var/log/probe/KibanaStartup.log"
 
-wait_for_es_reachable() {
-   ES_REACHABLE=false
-
-   while [ "$ES_REACHABLE" = false ]
-   do
-      # Wait until localhost:9200 is reachable with an HTTP OK status of 200
-      curl "$XHEAD_PARAMS" -XHEAD "$ES_HEAD" 2>/dev/null | grep -i "200"
-      if [ $? == 0 ]; then
-         echo `date +'%D %T'` "  ELASTICSEARCH is now reachable"  >> $KIBANA_LOG_FILE
-         ES_REACHABLE=true
-      fi
-   done
-}
-
 if [ ! -e $KIBANA_LOG_FILE ]; then
    touch $KIBANA_LOG_FILE
 fi
-
-wait_for_es_reachable
 
 # Create the index pattern and specify TimeUpdated as the default time parameter
 curl "$XHEAD_PARAMS" -XHEAD "$KIBANA_PREFIX""$INDEX_PATTERN" | grep -i "$NOT_FOUND"
