@@ -10,16 +10,15 @@ DASHBOARDS="dashboards"
 VISUALIZATIONS="visualizations"
 SEARCHES="searches"
 PRETTY="?pretty"
-
-# Directories directly under the kibana folder include:
+NOT_FOUND="404"
+SILENT="-q"
+# Directories directly under the kibana/resources folder include:
 #   dashboards
 #   visualizations
 #   searches
 
-cd "$TOP_LEVEL_DIR"
-
 # DASHBOARDS
-curl -i -XHEAD "$KIBANA_PREFIX"/dashboard | grep -i "not found"
+curl -i -XHEAD "$KIBANA_PREFIX"/dashboard | grep "$SILENT" "$NOT_FOUND"
 dashboards_set=$?
 if [ $dashboards_set == 0 ]; then
     echo `date +'%D %T'` "  INSERTING DASHBOARDS INTO ELASTICSEARCH"                                                >> $KIBANA_LOG_FILE
@@ -36,7 +35,7 @@ else
 fi
 
 # VISUALIZATIONS
-curl -i -XHEAD "$KIBANA_PREFIX"/visualization | grep -i "not found"
+curl -i -XHEAD "$KIBANA_PREFIX"/visualization | grep "$SILENT" "$NOT_FOUND"
 visualizations_set=$?
 if [ $visualizations_set == 0 ]; then
     echo `date +'%D %T'` "  INSERTING VISUALIZATIONS INTO ELASTICSEARCH"                                            >> $KIBANA_LOG_FILE
@@ -53,7 +52,7 @@ else
 fi
 
 # SEARCHES
-curl -i -XHEAD "$KIBANA_PREFIX"/search | grep -i "not found"
+curl -i -XHEAD "$KIBANA_PREFIX"/search | grep "$SILENT" "$NOT_FOUND"
 searches_set=$?
 if [ $searches_set == 0 ]; then
     echo `date +'%D %T'` "  INSERTING SEARCHES INTO ELASTICSEARCH"                                                  >> $KIBANA_LOG_FILE
