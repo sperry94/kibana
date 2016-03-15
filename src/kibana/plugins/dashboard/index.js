@@ -3,7 +3,7 @@ define(function (require) {
   var $ = require('jquery');
   var angular = require('angular');
   var ConfigTemplate = require('utils/config_template');
-
+  var datemath = require('utils/datemath');
   require('directives/config');
   require('components/courier/courier');
   require('components/config/config');
@@ -21,6 +21,7 @@ define(function (require) {
 
   require('plugins/dashboard/directives/grid');
   require('plugins/dashboard/components/panel/panel');
+  require('plugins/dashboard/components/modal/searchAuditor');
   require('plugins/dashboard/services/saved_dashboards');
   require('css!plugins/dashboard/styles/main.css');
 
@@ -57,9 +58,25 @@ define(function (require) {
     }
   });
 
-  app.directive('dashboardApp', function (Notifier, courier, AppState, timefilter, kbnUrl) {
-    return {
-      controller: function ($scope, $route, $routeParams, $location, $http, configFile, Private, getAppState, $modal) {
+    app.directive('dashboardApp', function (Notifier, courier, AppState,
+                                            timefilter, kbnUrl, searchAuditor) {
+        return {
+          link: function(scope, elem) {
+              elem.on('submit', function() {
+                  // TODO: find what event kibana4 uses for searches to listen instead
+                  scope.state.query =
+                      {
+                          query_string : {
+                              query : searchAuditor.autoCapQuery(scope.state.query['query_string']['query'])
+                          }
+                      };
+                  scope.filterResults();
+                  searchAuditor.logQuery(scope.state.query['query_string']['query'],
+                                         datemath.parse(scope.timefilter.time.from),
+                                         datemath.parse(scope.timefilter.time.to));
+              });
+          },
+        controller: function ($scope, $route, $routeParams, $location, $http, configFile, Private, getAppState, $modal) {
         var queryFilter = Private(require('components/filter_bar/query_filter'));
 
         var notify = new Notifier({
