@@ -27,10 +27,10 @@ define(function (require) {
                 return formatQuery(query)[0];
             },
             logQuery : function(query, from, to) {
+                // ignore these searches for search auditing
                 if (!from || !to || 
                     query === "" || 
-                    query === "*" || 
-                    query === "+Captured:true") {
+                    query === "*") {
                     return;
                 }
                 var formatString = "YYYY/MM/DD HH:mm:ss";
