@@ -66,12 +66,13 @@ define(function (require) {
         $scope.$on('$destroy', dash.destroy);
 
         var matchQueryFilter = function (filter) {
-          return filter.query && filter.query.query_string && !filter.meta;
+            return (filter.query && filter.query.query_string && !filter.meta) ||
+                (filter.range && (filter.range.gte || filter.range.lte) && !filter.meta);
         };
 
         var extractQueryFromFilters = function (filters) {
           var filter = _.find(filters, matchQueryFilter);
-          if (filter) return filter.query;
+          if (filter) return filter.query || filter.range;
         };
 
         var stateDefaults = {
