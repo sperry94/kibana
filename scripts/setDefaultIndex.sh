@@ -37,8 +37,22 @@ if [ "$index_pattern_exists" -eq "0"  ]; then
 else
    echo `date +'%D %T'` "  Index pattern \"network_*\" ALREADY EXISTS."                    >> $KIBANA_LOG_FILE
 fi
-   
+
 # Check for our custom field mappings
+#
+# BUG NOTICE: When the Kibana service starts, the first thing it does is check its default
+#             index-pattern and re-pull all of that metadata from elasticsearch. In our case,
+#             that means it goes to all the network_* indeces and re-caches the field names
+#             and updates the index-pattern/network_* record to reflect the fields it found.
+#
+#             There is a bug in Kibana 4.1 where when a record gets updated, specifically the
+#             key-value pair of "fieldFormatMap" gets overwritten. The bug report for it can
+#             be found here: https://github.com/elastic/kibana/issues/4309
+#
+#             This means that everytime Kibana restarts, we will lose our custom mappings.
+#             Fortunately this script checks for the "fieldFormatMap" on every Kibana startup,
+#             so we are always reloading our mappings succesfully. You will see this
+#             reflected in the Kibana startup log.
 curl -XGET localhost:9200/.kibana/index-pattern/network_* | grep -q "fieldFormatMap"
 field_format_map_exists=$?
 if [ "$field_format_map_exists" -ne "0" ]; then
