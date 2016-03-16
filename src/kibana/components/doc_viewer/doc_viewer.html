@@ -23,6 +23,16 @@
                 tooltip="Filter out value"
                 tooltip-append-to-body="1"
                 class="fa fa-search-minus"></i>
+              <i ng-click="filter(mapping[field], flattened[field],'<=')"
+                 tooltip="Filter less than or equal to value"
+                 tooltip-append-to-body="1"
+                 class="fa fa-search-less-than-equal"
+                 ng-show="mapping[field].type === 'number'"></i>
+              <i ng-click="filter(mapping[field], flattened[field],'>=')"
+                 tooltip="Filter greater than or equal to value"
+                 tooltip-append-to-body="1"
+                 class="fa fa-search-greater-than-equal"
+                 ng-show="mapping[field].type === 'number'"></i>
             </span>
             <span ng-if="!mapping[field].filterable" tooltip="Unindexed fields can not be searched">
               <i class="fa fa-search-plus text-muted"></i>
