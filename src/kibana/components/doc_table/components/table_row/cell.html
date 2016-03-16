@@ -1,6 +1,5 @@
 <%
 var attributes = '';
-var clickable = '';
 if (timefield) {
   attributes='class="discover-table-timefield" width="1%"';
 } else if (sourcefield) {
@@ -9,13 +8,16 @@ if (timefield) {
   attributes='class="discover-table-datafield"';
 }
 if (formatted.downloadButton && formatted.downloadButton === 'pcap') {
-    clickable = 'ng-click="fileDownload()"';
-    formatted.text = '<span aria-hidden="true" class="fa fa-arrow-circle-o-down"></span>';
+    formatted.text = '<span ng-click="downloadQueueManager.getCheckedSessions(\'' + formatted.tableID + '\')" aria-hidden="true" class="fa fa-arrow-circle-o-down large" style="padding-right:5px"></span>';
+    formatted.text += '<input type="checkbox"' + 
+        'ng-checked="downloadQueueManager.isBoxChecked(\'' + formatted.tableID + '\',\'' + formatted.sessionKey + '\')"' + 
+        'ng-click="downloadQueueManager.toggleCaptureSelection(\'' + formatted.tableID + '\',\'' + formatted.sessionKey + '\')"' + 
+        'ng-disabled=""' +
+        'style="margin-top: -1px" />'
 } else if (formatted.downloadButton && formatted.downloadButton === 'file') {
-    clickable = 'ng-click="fileDownload()"';
     formatted.text = '<span aria-hidden="true" class="fa fa-download"></span>';
 }
 %>
-<td <%= attributes %> clickable>
+<td <%= attributes %> >
   <%= formatted.text %>
 </td>

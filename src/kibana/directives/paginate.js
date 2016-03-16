@@ -2,9 +2,9 @@ define(function (require) {
   var _ = require('lodash');
 
   var PER_PAGE_DEFAULT = 10;
-
+  require('netmon_libs/custom_modules/download/services/downloadQueueManager');
   require('modules').get('kibana')
-  .directive('paginate', function ($parse, $compile) {
+  .directive('paginate', function ($parse, $compile, DownloadQueueManager) {
     return {
       restrict: 'E',
       scope: true,
@@ -22,7 +22,7 @@ define(function (require) {
           }
 
           var paginate = $scope.paginate;
-
+          paginate.downloadQueueManager = DownloadQueueManager;
           // add some getters to the controller powered by attributes
           paginate.getList = $parse(attrs.list);
           paginate.perPageProp = attrs.perPageProp;
@@ -33,9 +33,13 @@ define(function (require) {
           } else {
             $scope.showSelector = true;
           }
+          
+          if (attrs.type) {
+              paginate.type = attrs.type;
+          }
 
           paginate.otherWidthGetter = $parse(attrs.otherWidth);
-
+          
           paginate.init();
         }
       },
@@ -55,7 +59,10 @@ define(function (require) {
         self.init = function () {
 
           self.perPage = _.parseInt(self.perPage) || $scope[self.perPageProp];
-
+          if (self.type === 'savedsearch') {
+              // sorry... had to grab panel name from parent (x6) scope
+              $scope.tableID = $scope.$parent.$parent.$parent.$parent.$parent.$parent.panel.id;
+          }
           $scope.$watchMulti([
             'paginate.perPage',
             self.perPageProp,
@@ -126,12 +133,18 @@ define(function (require) {
 
             $scope.pages.push(page);
           });
-
+          
           // set the new page, or restore the previous page number
           if ($scope.page && $scope.page.i < $scope.pages.length) {
             $scope.page = $scope.pages[$scope.page.i];
           } else {
             $scope.page = $scope.pages[0];
+          }
+          
+          if (self.type && (self.type === 'savedsearch')) {
+              self.downloadQueueManager.setPageDirectory($scope.tableID, $scope.pages);
+              self.downloadQueueManager.setCurrentPage($scope.tableID, $scope.page);
+              self.downloadQueueManager.clearDownloadQueue($scope.tableID);
           }
         };
 
@@ -183,6 +196,7 @@ define(function (require) {
             return true;
           }
         }
+
       }
     };
   })

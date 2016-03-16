@@ -9,7 +9,8 @@ define(function (require) {
   require('components/doc_viewer/doc_viewer');
   require('filters/trust_as_html');
   require('filters/short_dots');
-  require('netmon_libs/custom_modules/table_row/services/downloadButtonService');
+  require('netmon_libs/custom_modules/download/services/downloadButtonService');
+  require('netmon_libs/custom_modules/download/services/downloadQueueManager');
 
 
   // guesstimate at the minimum number of chars wide cells in the table should be
@@ -23,7 +24,7 @@ define(function (require) {
    * <tr ng-repeat="row in rows" kbn-table-row="row"></tr>
    * ```
    */
-  module.directive('kbnTableRow', function ($compile, DownloadButtonService) {
+  module.directive('kbnTableRow', function ($compile, DownloadButtonService, DownloadQueueManager) {
     var noWhiteSpace = require('utils/no_white_space');
     var openRowHtml = require('text!components/doc_table/components/table_row/open.html');
     var detailsHtml = require('text!components/doc_table/components/table_row/details.html');
@@ -36,16 +37,21 @@ define(function (require) {
         columns: '=',
         filter: '=',
         indexPattern: '=',
-        row: '=kbnTableRow'
+        row: '=kbnTableRow',
+        type: '='
       },
       link: function ($scope, $el) {
         $el.after('<tr>');
         $el.empty();
 
         var init = function () {
+          $scope.downloadQueueManager = DownloadQueueManager;
+          if ($scope.type && ($scope.type === 'savedsearch')) {
+              // sorry... had to grab panel name from parent (x9) scope :(
+              $scope.tableID = $scope.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.panel.id;
+          }
           createSummaryRow($scope.row, $scope.row._id);
         };
-
         // when we compile the details, we use this $scope
         var $detailsScope;
 
@@ -80,6 +86,8 @@ define(function (require) {
 
           $compile($detailsTr)($detailsScope);
         };
+        
+
 
         $scope.$watchCollection('columns', function () {
           createSummaryRow($scope.row, $scope.row._id);
@@ -167,10 +175,12 @@ define(function (require) {
 
           return {
               text : text,
-              downloadButton : downloadButton 
+              downloadButton : downloadButton,
+              sessionKey : row._id,
+              tableID : $scope.tableID
           };
         }
-
+        
         init();
       }
     };
