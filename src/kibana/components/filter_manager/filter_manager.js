@@ -73,7 +73,7 @@ define(function (require) {
                       filter.range[fieldName] = {
                           lte : value
                       };
-                  } else if (operation == ">=") {
+                  } else if (operation === ">=") {
                       filter.range[fieldName] = {
                           gte : value
                       };
