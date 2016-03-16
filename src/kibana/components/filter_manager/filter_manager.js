@@ -12,7 +12,7 @@ define(function (require) {
       var newFilters = [];
 
       var negate = (operation === '-');
-
+      var range_match = (operation === "<=" || operation === ">=");
       // TODO: On array fields, negating does not negate the combination, rather all terms
       _.each(values, function (value) {
         var filter;
@@ -23,8 +23,10 @@ define(function (require) {
             return filter.exists.field === value;
           }
 
-          if (filter.query) {
+          if (filter.query && filter.query.match) {
             return filter.query.match[fieldName] && filter.query.match[fieldName].query === value;
+          } else if (filter.range) {
+              return filter.range[fieldName] && filter.range[fieldName].query === value;
           }
 
           if (filter.script) {
@@ -65,8 +67,21 @@ define(function (require) {
               }
             };
           } else {
-            filter = { meta: { negate: negate, index: index }, query: { match: {} } };
-            filter.query.match[fieldName] = { query: value, type: 'phrase' };
+              if (range_match) {
+                  filter = { meta: { negate: negate, index: index }, range: {} };
+                  if (operation === "<=") {
+                      filter.range[fieldName] = {
+                          lte : value
+                      };
+                  } else if (operation == ">=") {
+                      filter.range[fieldName] = {
+                          gte : value
+                      };
+                  }
+              } else {
+                  filter = { meta: { negate: negate, index: index }, query: { match: {} } };
+                  filter.query.match[fieldName] = { query: value, type: 'phrase' };   
+              }
           }
 
           break;
