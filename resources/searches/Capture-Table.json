@@ -1,9 +1,15 @@
 {
-   "title": "Captured:True",
+   "title": "Capture Table",
    "description": "",
    "hits": 0,
    "columns": [
-      "_source"
+      "SrcIP",
+      "DestIP",
+      "Application",
+      "Duration",
+      "FlowCompleted",
+      "Session",
+      "Captured"
    ],
    "sort": [
       "TimeUpdated",

@@ -6,6 +6,6 @@
    "version": 1,
    "timeRestore": false,
    "kibanaSavedObjectMeta": {
-      "searchSourceJSON": "{\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"network_*\",\"key\":\"Captured\",\"value\":\"true\",\"disabled\":false},\"query\":{\"match\":{\"Captured\":{\"query\":true,\"type\":\"phrase\"}}}},{\"query\":{\"query_string\":{\"query\":\"Captured:True\",\"analyze_wildcard\":true}}}]}"
+      "searchSourceJSON": "{\"filter\":[{\"meta\":{\"negate\":false,\"index\":\"network_*\",\"key\":\"Captured\",\"value\":\"true\",\"disabled\":false},\"query\":{\"match\":{\"Captured\":{\"query\":true,\"type\":\"phrase\"}}}}]}"
    }
 }
