@@ -42,7 +42,7 @@ fi
 #
 # BUG NOTICE: When the Kibana service starts, the first thing it does is check its default
 #             index-pattern and re-pull all of that metadata from elasticsearch. In our case,
-#             that means it goes to all the network_* indeces and re-caches the field names
+#             that means it goes to all the network_* indices and re-caches the field names
 #             and updates the index-pattern/network_* record to reflect the fields it found.
 #
 #             There is a bug in Kibana 4.1 where when a record gets updated, specifically the
