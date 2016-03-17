@@ -7,6 +7,7 @@ define(function (require) {
   
   app.factory('DownloadQueueManager', function ($q, $timeout, $http, Restangular) {
      var downloadQueue = {};
+     var bulkChecked = {};
      var manager = {};
      var pageDirectory = {};
      var currentPage = {};
@@ -26,6 +27,7 @@ define(function (require) {
      
      manager.clearDownloadQueue = function(tableID) {
          downloadQueue[tableID] = [];
+         manager.unCheckBulk(tableID);
      };
      
      manager.getDownloadQueueByID = function (tableID) {
@@ -61,6 +63,18 @@ define(function (require) {
      
      manager.getCheckedSessions = function(tableID) {
          console.log('checked: ', downloadQueue[tableID]);
+     };
+     
+     manager.isBulkChecked = function(tableID) {
+         return bulkChecked[tableID];
+     };
+     
+     manager.checkBulk = function(tableID) {
+         bulkChecked[tableID] = true;
+     };
+     
+     manager.unCheckBulk = function(tableID) {
+         bulkChecked[tableID] = false;
      };
      
      return manager;
