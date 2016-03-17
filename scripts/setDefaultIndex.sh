@@ -53,7 +53,7 @@ fi
 #             Fortunately this script checks for the "fieldFormatMap" on every Kibana startup,
 #             so we are always reloading our mappings succesfully. You will see this
 #             reflected in the Kibana startup log.
-curl -XGET localhost:9200/.kibana/index-pattern/network_* | grep -q "fieldFormatMap"
+curl -XGET "$KIBANA_PREFIX""$INDEX_PATTERN" | grep "$SILENT" "fieldFormatMap"
 field_format_map_exists=$?
 if [ "$field_format_map_exists" -ne "0" ]; then
    echo `date +'%D %T'` "  Custom fieldFormatMap doesn't exist. Creating it..."            >> $KIBANA_LOG_FILE
