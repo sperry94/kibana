@@ -1,13 +1,13 @@
 {
-  "title": "Email SMTP Search",
+  "title": "SMTP Table",
   "description": "",
   "hits": 0,
   "columns": [
     "SenderEmail",
     "ReceiverEmail",
     "Subject",
-    "Application",
-    "TotalBytes"
+    "TotalBytes",
+    "Attach"
   ],
   "sort": [
     "TimeUpdated",
