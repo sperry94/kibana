@@ -27,7 +27,6 @@ define(function (require) {
      
      manager.clearDownloadQueue = function(tableID) {
          downloadQueue[tableID] = [];
-         manager.unCheckBulk(tableID);
      };
      
      manager.getDownloadQueueByID = function (tableID) {
@@ -64,17 +63,48 @@ define(function (require) {
      manager.getCheckedSessions = function(tableID) {
          console.log('checked: ', downloadQueue[tableID]);
      };
-     
+
      manager.isBulkChecked = function(tableID) {
-         return bulkChecked[tableID];
+         if (bulkChecked[tableID]){
+             return bulkChecked[tableID];
+         }
+         return false;
      };
      
      manager.checkBulk = function(tableID) {
+         if (!bulkChecked[tableID]){
+             bulkChecked[tableID] = {};
+         }
          bulkChecked[tableID] = true;
      };
      
      manager.unCheckBulk = function(tableID) {
+         if (!bulkChecked[tableID]){
+             bulkChecked[tableID] = {};
+         }
+         manager.clearDownloadQueue(tableID);
          bulkChecked[tableID] = false;
+     };
+     
+     manager.getPageID = function(tableID) {
+         return currentPage[tableID].number;
+     };
+     
+     manager.selectAllFromCurrentPage = function(tableID) {
+         _.each(currentPage[tableID], function(row){
+             if (!manager.isBoxChecked(tableID, row._id)){
+                 manager.addToDownloadQueue(tableID, row._id);
+             }
+         });
+     };
+     
+     manager.selectAllCaptures = function(tableID) {
+         downloadQueue[tableID] = [];
+         _.each(pageDirectory[tableID], function(page){
+             _.each(page, function(row){
+                manager.addToDownloadQueue(tableID, row._id);
+             });
+         });
      };
      
      return manager;

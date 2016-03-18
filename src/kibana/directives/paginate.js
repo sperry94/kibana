@@ -153,6 +153,9 @@ define(function (require) {
             $scope.otherPages = null;
             return;
           }
+          if (self.type && (self.type === 'savedsearch')) {
+              self.downloadQueueManager.setCurrentPage($scope.tableID, $scope.page);
+          }
 
           // setup the list of the other pages to link to
           $scope.otherPages = [];
