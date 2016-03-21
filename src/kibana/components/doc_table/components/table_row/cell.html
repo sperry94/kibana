@@ -15,7 +15,7 @@ if (formatted.downloadButton && formatted.downloadButton === 'pcap') {
         'ng-disabled=""' +
         'style="margin-top: -1px" />'
 } else if (formatted.downloadButton && formatted.downloadButton === 'file') {
-    formatted.text = '<span aria-hidden="true" class="fa fa-download"></span>';
+    formatted.text = '<span aria-hidden="true" class="fa fa-download" ng-click="downloadModalManager.downloadReconstructedFile(row)"></span>';
 }
 %>
 <td <%= attributes %> >

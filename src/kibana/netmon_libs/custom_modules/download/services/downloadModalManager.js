@@ -125,7 +125,7 @@ define(function (require) {
     
     manager.downloadReconstructedFile = function(rowData) {
         downloadStatus = {};
-        filesToDownload = fileDownloader.deDupeFiles(rowData._source.Filename.split(','));
+        filesToDownload = fileDownloader.deDupeFiles(rowData._source.Filename);
         downloadSettings.fileList = filesToDownload;
         downloadRequest = fileDownloader.get(downloadSettings, 'reconstruction', rowData._source.Session);
     };
