@@ -1,9 +1,11 @@
 define(function (require) {
   var moment = require('moment');
   var $ = require('jquery');
+  require('netmon_libs/custom_modules/download/services/downloadQueueManager');
   require('modules')
   .get('app/dashboard')
-  .directive('dashboardPanel', function (savedVisualizations, savedSearches, Notifier, Private, $injector) {
+  .directive('dashboardPanel', function (savedVisualizations, savedSearches, Notifier, 
+      Private, $injector, DownloadQueueManager) {
     var _ = require('lodash');
     var loadPanel = Private(require('plugins/dashboard/components/panel/lib/load_panel'));
     var filterManager = Private(require('components/filter_manager/filter_manager'));
@@ -65,6 +67,10 @@ define(function (require) {
 
         $scope.remove = function () {
           _.pull($state.panels, $scope.panel);
+        };
+        
+        $scope.numSelected = function() {
+            return DownloadQueueManager.getSelectedCount($scope.panel.id);
         };
       }
     };

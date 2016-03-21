@@ -85,8 +85,8 @@ define(function (require) {
                         {
                             header: 'Canceled', 
                             body: 'Download canceled.',
-                            class: 'alert alert-warning'
-                        }, settings.fileUrl);
+                            class: 'modal-header alert alert-warning'
+                        }, 'Canceled');
                 };
                 
 
@@ -119,15 +119,15 @@ define(function (require) {
                     Restangular
                         .one(self.route)
                         .withHttpConfig({timeout: 15000})
-                        .get({action: "status", downloadID: downloadID})
+                        .get({action: 'status', downloadID: downloadID})
                         .then(function(statusList){
                             if (statusList['interrupt']){ // the session was cleared during download
                                 settings.failCallback(
                                      {
-                                        header: "Failure",
-                                        body: "Download interrupted.",
-                                        class: 'alert alert-error'
-                                    },  "failure", false);  
+                                        header: 'Failure',
+                                        body: 'Download interrupted.',
+                                        class: 'modal-header alert alert-danger'
+                                    },  'failure');  
 
                             }
                             statusList = JSON.parse(statusList);
@@ -138,10 +138,10 @@ define(function (require) {
                                 } else {
                                     settings.failCallback(
                                         {
-                                            header: "Failure",
-                                            body: "One or more of the downloads failed.",
-                                            class: 'alert alert-error'
-                                        },  bulkStatus.bulkStatus, false);  
+                                            header: 'Failure',
+                                            body: 'One or more of the downloads failed.',
+                                            class: 'modal-header alert alert-danger'
+                                        },  bulkStatus.bulkStatus);  
                                 } 
                                 iframe.contentWindow.stop();
                                 iframe.parentNode.removeChild(iframe);
@@ -152,7 +152,7 @@ define(function (require) {
                                 }, settings.checkInterval);
                             }
                         });
-                }
+                };
 
                 var main = function(){
                     self.interrupt = false;
@@ -161,23 +161,23 @@ define(function (require) {
                         .withHttpConfig({timeout: 3000})
                         .post(self.postData)
                         .then(function(res){
-                            if (res['status'] === 'failure'){
+                            if (res.status === 'failure'){
                                 settings.failCallback(
                                         {
-                                            header: "Failure",
+                                            header: 'Failure',
                                             body: res.data.message,
-                                            class: 'alert alert-error'
-                                        },  "Error", true); 
+                                            class: 'alert alert-danger'
+                                        },  'Error'); 
                             } else {
-                                downloadID = res['downloadID'];
+                                downloadID = res.downloadID;
                                 settings.fileUrl += downloadID;
                                 settings.prepareCallback(settings.fileUrl);
                                 //create a temporary iframe that is used to request the fileUrl as a GET request
-                                iframe = document.createElement("iframe");
-    							iframe.style.display = "none";
+                                iframe = document.createElement('iframe');
+    							iframe.style.display = 'none';
 
                                 iframe.src = settings.fileUrl;
-                                (document.getElementsByTagName("body")[0]).appendChild(iframe);
+                                (document.getElementsByTagName('body')[0]).appendChild(iframe);
 
                                // check if the file download has completed every checkInterval ms
                                 $timeout(function(){
@@ -185,11 +185,11 @@ define(function (require) {
                                 }, settings.checkInterval);
                             }
                         });
-                }
+                };
 
                 main();
                 return this;
             }
-        }
+        };
      });
 });

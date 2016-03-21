@@ -20,7 +20,7 @@ define(function (require) {
      };
      
      manager.getSelectedCount = function(tableID) {
-         return Object.keys(downloadQueue).length;
+         return _.keys(downloadQueue[tableID]).length;
      };
      
      manager.removeFromDownloadQueue = function(tableID, id) {
@@ -62,10 +62,6 @@ define(function (require) {
              }
          }
          return false;
-     };
-     
-     manager.getCheckedSessions = function(tableID) {
-         console.log('checked: ', downloadQueue[tableID]);
      };
 
      manager.isBulkChecked = function(tableID) {
