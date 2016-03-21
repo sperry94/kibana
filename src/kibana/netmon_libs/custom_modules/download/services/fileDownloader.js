@@ -1,5 +1,6 @@
 define(function (require) {
    
+    var _ = require('lodash');
     var app = require('modules').get('netmon/download');
     app.factory('fileDownloader', function(Restangular, $timeout) {
         return {
@@ -61,24 +62,24 @@ define(function (require) {
     			 
                 var self = this;
                 var iframe = null;
-    				var downloadID = null;
-    				self.route = type + '/';
-    				self.type = type;
-    				self.postData = {file  : settings.fileList};
-    				
-    				settings.checkInterval = 500;
-    				settings.fileUrl = "/data/api/" + self.route + "?action=download&downloadID=";
+				var downloadID = null;
+				self.route = type + '/';
+				self.type = type;
+				self.postData = {file  : settings.fileList};
+				
+				settings.checkInterval = 500;
+				settings.fileUrl = '/data/api/' + self.route + '?action=download&downloadID=';
 
-    				// sessionID needed for File Recon only (NOT pcap recon)
-    				if (sessionID) {
-    					self.postData.sessionID = sessionID;
-    				}
+				// sessionID needed for File Recon only (NOT pcap recon)
+				if (sessionID) {
+					self.postData.sessionID = sessionID;
+				}
     				
                 var cancelDownload = function(downloadID) {
                     Restangular
                         .one(self.route)
                         .withHttpConfig({timeout: 1000})
-                        .get({action: "abort", downloadID: downloadID});
+                        .get({action: 'abort', downloadID: downloadID});
 
                     settings.failCallback(
                         {
@@ -86,29 +87,29 @@ define(function (require) {
                             body: 'Download canceled.',
                             class: 'alert alert-warning'
                         }, settings.fileUrl);
-                }
+                };
                 
 
                 var getiframeDocument = function(iframe) {
                     var iframeDoc = iframe.contentWindow || iframe.contentDocument;
                     iframeDoc = iframe.document ? iframeDoc.document : iframeDoc;
                     return iframeDoc;
-                }
+                };
 
                 var checkBulkDownloadCompleteStatus = function(statusList) {
                    var hasCompleted = true;
                    var completedSuccessfully = true;
                    var fileStatus = {};
                     _.each(statusList, function(status, session){
-                        hasCompleted &= status['completed'];
-                        completedSuccessfully &= (status.status === "success");
+                        hasCompleted &= status.completed;
+                        completedSuccessfully &= (status.status === 'success');
                     });
                     return {
-                        "hasCompleted" : hasCompleted,
-                        "completedSuccessfully" : completedSuccessfully,
-                        "bulkStatus" : statusList
+                        'hasCompleted' : hasCompleted,
+                        'completedSuccessfully' : completedSuccessfully,
+                        'bulkStatus' : statusList
                     };
-                }
+                };
 
                 var checkFileDownloadProgress = function(downloadID) {
                     if(self.interrupt){
@@ -173,7 +174,7 @@ define(function (require) {
                                 settings.prepareCallback(settings.fileUrl);
                                 //create a temporary iframe that is used to request the fileUrl as a GET request
                                 iframe = document.createElement("iframe");
-    									 iframe.style.display = "none";
+    							iframe.style.display = "none";
 
                                 iframe.src = settings.fileUrl;
                                 (document.getElementsByTagName("body")[0]).appendChild(iframe);

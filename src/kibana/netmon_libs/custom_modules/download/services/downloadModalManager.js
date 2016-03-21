@@ -83,9 +83,7 @@ define(function (require) {
         var downloadQueue = DownloadQueueManager.getDownloadQueue(tableID);
         filesToDownload = [];
         downloadStatus = {};
-        console.log('queue: ', downloadQueue);
         if (_.isEmpty(downloadQueue[tableID])) {
-            console.log('downloadQueue is empty: ', downloadQueue[tableID]);
            filesToDownload.push(rowData._source.Session);
         } else {
             _.each(downloadQueue[tableID], function(id){
@@ -93,17 +91,16 @@ define(function (require) {
                     filesToDownload.push(id);
                 }
           });
-    }
-    downloadSettings.fileList = filesToDownload;
-    console.log('donwload list: ', downloadSettings.fileList);
-    //downloadRequest = fileDownloader.get(downloadSettings, 'pcap');
+        }
+        downloadSettings.fileList = filesToDownload;
+        var downloadRequest = fileDownloader.get(downloadSettings, 'pcap');
 };
     
     manager.downloadReconstructedFile = function(rowData) {
         downloadStatus = {};
         filesToDownload = fileDownloader.deDupeFiles(rowData._source.Filename.split(','));
         downloadSettings.fileList = filesToDownload;
-        downloadRequest = fileDownloader.get(downloadSettings, 'reconstruction', rowData._source.Session);
+        var downloadRequest = fileDownloader.get(downloadSettings, 'reconstruction', rowData._source.Session);
     };
   
     manager.formatFileNameForModal = function(fileName){
