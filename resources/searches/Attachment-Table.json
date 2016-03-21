@@ -3,12 +3,12 @@
   "description": "",
   "hits": 0,
   "columns": [
+    "Attach",
     "SenderEmail",
     "ReceiverEmail",
     "Filename",
     "AttachSize",
-    "AttachType",
-    "Attach"
+    "AttachType"
   ],
   "sort": [
     "TimeUpdated",
