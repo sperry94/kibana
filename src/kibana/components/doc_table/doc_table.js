@@ -27,6 +27,7 @@ define(function (require) {
       link: function ($scope) {
         var notify = new Notifier();
         $scope.limit = 50;
+        $scope.type = 'savedsearch';
         $scope.persist = {
           sorting: $scope.sorting,
           columns: $scope.columns

@@ -16,16 +16,18 @@ define(function (require) {
         columns: '=',
         sorting: '=',
         indexPattern: '=',
+        type: '='
       },
       template: headerHtml,
       controller: function ($scope) {
         $scope.downloadQueueManager = DownloadQueueManager;
         $scope.captureSelectModalManager = CaptureSelectModalManager;
-        console.log('table header scope: ', $scope);
         
-        //TODO: figure out a way to pass in type=savedsearch
-        // sorry... had to grab panel name from parent (x8) scope :(
-        $scope.tableID = $scope.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.panel.id;
+        if ($scope.type && ($scope.type === 'savedsearch')){
+            // sorry... had to grab panel name from parent (x8) scope :(
+            $scope.tableID = $scope.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.panel.id;
+        }
+        
   
         var sortableField = function (field) {
           if (!$scope.indexPattern) return;

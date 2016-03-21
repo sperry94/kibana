@@ -59,7 +59,7 @@ define(function (require) {
         self.init = function () {
 
           self.perPage = _.parseInt(self.perPage) || $scope[self.perPageProp];
-          if (self.type === 'savedsearch') {
+          if (self.type && (self.type === 'savedsearch')) {
               // sorry... had to grab panel name from parent (x6) scope
               $scope.tableID = $scope.$parent.$parent.$parent.$parent.$parent.$parent.panel.id;
           }
