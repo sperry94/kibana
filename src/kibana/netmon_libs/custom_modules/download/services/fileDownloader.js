@@ -1,13 +1,13 @@
 define(function (require) {
    
-    var app = require('modules').get('app/discover');
-    app.factory('pcapDownloader', function(Restangular, $timeout) {
+    var app = require('modules').get('netmon/download');
+    app.factory('fileDownloader', function(Restangular, $timeout) {
         return {
              deDupeFiles : function(fileList) {
                  
                  var countOccurences = function(fileList) {
                     var dupes = false;
-                    itemFreq = {};
+                    var itemFreq = {};
                     _.each(fileList, function(file){
                        if (!itemFreq[file]){
                           itemFreq[file] = 1;

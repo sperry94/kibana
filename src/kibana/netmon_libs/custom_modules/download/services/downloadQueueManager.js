@@ -12,21 +12,23 @@ define(function (require) {
      var pageDirectory = {};
      var currentPage = {};
      
-     manager.addToDownloadQueue = function (tableID, sessionID) {
+     manager.addToDownloadQueue = function (tableID, row) {
          if (!downloadQueue[tableID]){
-             downloadQueue[tableID] = [];
+             downloadQueue[tableID] = {};
          }
-         downloadQueue[tableID].push(sessionID);
+         downloadQueue[tableID][row._id] = row._source.Session;
      };
      
-     manager.removeFromDownloadQueue = function(tableID, sessionID) {
-         _.remove(downloadQueue[tableID], function(id){
-             return (id === sessionID);
-         });
+     manager.getSelectedCount = function(tableID) {
+         return Object.keys(downloadQueue).length;
+     };
+     
+     manager.removeFromDownloadQueue = function(tableID, id) {
+         delete downloadQueue[tableID][id];
      };
      
      manager.clearDownloadQueue = function(tableID) {
-         downloadQueue[tableID] = [];
+         downloadQueue[tableID] = {};
      };
      
      manager.getDownloadQueueByID = function (tableID) {
@@ -45,17 +47,19 @@ define(function (require) {
          currentPage[tableID] = page;
      };
      
-     manager.toggleCaptureSelection = function(tableID, sessionKey) {
-         if (!manager.isBoxChecked(tableID, sessionKey)) {
-             manager.addToDownloadQueue(tableID, sessionKey);
+     manager.toggleCaptureSelection = function(tableID, row) {
+         if (!manager.isBoxChecked(tableID, row)) {
+             manager.addToDownloadQueue(tableID, row);
          } else {
-             manager.removeFromDownloadQueue(tableID, sessionKey);
+             manager.removeFromDownloadQueue(tableID, row._id);
          }
      };
      
-     manager.isBoxChecked = function(tableID, sessionKey) {
+     manager.isBoxChecked = function(tableID, row) {
          if (downloadQueue[tableID]) {
-             return _.contains(downloadQueue[tableID], sessionKey);
+             if (downloadQueue[tableID][row._id]){
+                 return true;
+             }
          }
          return false;
      };
@@ -92,17 +96,17 @@ define(function (require) {
      
      manager.selectAllFromCurrentPage = function(tableID) {
          _.each(currentPage[tableID], function(row){
-             if (!manager.isBoxChecked(tableID, row._id)){
-                 manager.addToDownloadQueue(tableID, row._id);
+             if (!manager.isBoxChecked(tableID, row)){
+                 manager.addToDownloadQueue(tableID, row);
              }
          });
      };
      
      manager.selectAllCaptures = function(tableID) {
-         downloadQueue[tableID] = [];
+         downloadQueue[tableID] = {};
          _.each(pageDirectory[tableID], function(page){
              _.each(page, function(row){
-                manager.addToDownloadQueue(tableID, row._id);
+                manager.addToDownloadQueue(tableID, row);
              });
          });
      };

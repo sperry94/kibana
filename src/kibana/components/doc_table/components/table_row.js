@@ -11,6 +11,7 @@ define(function (require) {
   require('filters/short_dots');
   require('netmon_libs/custom_modules/download/services/downloadButtonService');
   require('netmon_libs/custom_modules/download/services/downloadQueueManager');
+  require('netmon_libs/custom_modules/download/services/downloadModalManager');
 
 
   // guesstimate at the minimum number of chars wide cells in the table should be
@@ -24,7 +25,8 @@ define(function (require) {
    * <tr ng-repeat="row in rows" kbn-table-row="row"></tr>
    * ```
    */
-  module.directive('kbnTableRow', function ($compile, DownloadButtonService, DownloadQueueManager) {
+  module.directive('kbnTableRow', function ($compile, DownloadButtonService, 
+      DownloadQueueManager, DownloadModalManager) {
     var noWhiteSpace = require('utils/no_white_space');
     var openRowHtml = require('text!components/doc_table/components/table_row/open.html');
     var detailsHtml = require('text!components/doc_table/components/table_row/details.html');
@@ -46,6 +48,7 @@ define(function (require) {
 
         var init = function () {
           $scope.downloadQueueManager = DownloadQueueManager;
+          $scope.downloadModalManager = DownloadModalManager;
           //TODO: figure out a way to pass in type=savedsearch
           // sorry... had to grab panel name from parent (x9) scope :(
           $scope.tableID = $scope.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.panel.id;
@@ -175,7 +178,7 @@ define(function (require) {
           return {
               text : text,
               downloadButton : downloadButton,
-              sessionKey : row._id,
+              row : row,
               tableID : $scope.tableID
           };
         }
