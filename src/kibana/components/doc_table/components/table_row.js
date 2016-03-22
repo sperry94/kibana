@@ -49,10 +49,6 @@ define(function (require) {
         var init = function () {
           $scope.downloadQueueManager = DownloadQueueManager;
           $scope.downloadModalManager = DownloadModalManager;
-          if ($scope.type && ($scope.type === 'savedsearch')){
-              // sorry... had to grab panel name from parent (x9) scope :(
-              $scope.tableID = $scope.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.panel.id;
-          }
           createSummaryRow($scope.row, $scope.row._id);
         };
         // when we compile the details, we use this $scope

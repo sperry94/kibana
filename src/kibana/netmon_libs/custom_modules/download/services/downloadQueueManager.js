@@ -5,7 +5,7 @@ define(function (require) {
   require('angular-bootstrap');
   var app = require('modules').get('netmon/download', ['ui.bootstrap']);
   
-  app.factory('DownloadQueueManager', function ($q, $timeout, $http, Restangular) {
+  app.factory('DownloadQueueManager', function () {
      var downloadQueue = {};
      var bulkChecked = {};
      var manager = {};

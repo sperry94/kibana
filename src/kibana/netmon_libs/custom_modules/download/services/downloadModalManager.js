@@ -5,8 +5,7 @@ define(function (require) {
   var _ = require('lodash');
   var app = require('modules').get('netmon/download');
   
-  app.factory('DownloadModalManager', function ($q, $timeout, $http, Restangular,
-    $modal, DownloadQueueManager, fileDownloader) {
+  app.factory('DownloadModalManager', function ($modal, DownloadQueueManager, fileDownloader) {
     var manager = {};
     var reconModalContent = {};
     var filesToDownload = [];

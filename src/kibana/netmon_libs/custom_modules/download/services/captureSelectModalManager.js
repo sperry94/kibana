@@ -5,8 +5,7 @@ define(function (require) {
   var _ = require('lodash');
   var app = require('modules').get('netmon/download');
   
-  app.factory('CaptureSelectModalManager', function ($q, $timeout, $http, $modal,
-       Restangular, DownloadQueueManager) {
+  app.factory('CaptureSelectModalManager', function ($modal, DownloadQueueManager) {
     var manager = {};
     manager.toggleMultiCaptureBox = function(tableID) {
         if (DownloadQueueManager.isBulkChecked(tableID)){
