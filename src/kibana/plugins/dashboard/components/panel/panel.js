@@ -70,7 +70,11 @@ define(function (require) {
         };
         
         $scope.numSelected = function() {
-            return DownloadQueueManager.getSelectedCount($scope.panel.id);
+            var count = DownloadQueueManager.getSelectedCount($scope.panel.id);
+            if (count === 1) {
+                return count.toString() + ' item selected.'; 
+            }
+            return count.toString() + ' items selected.';
         };
       }
     };
