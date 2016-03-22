@@ -203,7 +203,16 @@ notifications {
     z-index: 2 !important;
   }
 }
-
+.lr-custom-search-less-than-equal:before {
+  content: "\2264"; // unicode for <= (≤)
+  font-size: 20;
+  font-weight: bold;
+}
+.lr-custom-search-greater-than-equal:before {
+  content: "\2265"; // unicode for >= (≥)
+  font-size:20;
+  font-weight: bold;
+}
 @import "./_table.less";
 @import "./_notify.less";
 
