@@ -3,11 +3,11 @@
   "description": "",
   "hits": 0,
   "columns": [
+    "Attach",
     "SenderEmail",
     "ReceiverEmail",
     "Subject",
-    "TotalBytes",
-    "Attach"
+    "TotalBytes"
   ],
   "sort": [
     "TimeUpdated",
