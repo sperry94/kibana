@@ -33,9 +33,8 @@ define(function (require) {
           } else {
             $scope.showSelector = true;
           }
-          
-          if (attrs.type) {
-              paginate.type = attrs.type;
+          if (attrs.tableId) {
+              paginate.tableID = attrs.tableId;
           }
 
           paginate.otherWidthGetter = $parse(attrs.otherWidth);
@@ -59,10 +58,7 @@ define(function (require) {
         self.init = function () {
 
           self.perPage = _.parseInt(self.perPage) || $scope[self.perPageProp];
-          if (self.type && (self.type === 'savedsearch')) {
-              // sorry... had to grab panel name from parent (x6) scope
-              $scope.tableID = $scope.$parent.$parent.$parent.$parent.$parent.$parent.panel.id;
-          }
+
           $scope.$watchMulti([
             'paginate.perPage',
             self.perPageProp,
@@ -141,10 +137,10 @@ define(function (require) {
             $scope.page = $scope.pages[0];
           }
           
-          if (self.type && (self.type === 'savedsearch')) {
-              self.downloadQueueManager.setPageDirectory($scope.tableID, $scope.pages);
-              self.downloadQueueManager.setCurrentPage($scope.tableID, $scope.page);
-              self.downloadQueueManager.clearDownloadQueue($scope.tableID);
+          if (self.tableID) {
+              self.downloadQueueManager.setPageDirectory(self.tableID, $scope.pages);
+              self.downloadQueueManager.setCurrentPage(self.tableID, $scope.page);
+              self.downloadQueueManager.clearDownloadQueue(self.tableID);
           }
         };
 
@@ -153,8 +149,8 @@ define(function (require) {
             $scope.otherPages = null;
             return;
           }
-          if (self.type && (self.type === 'savedsearch')) {
-              self.downloadQueueManager.setCurrentPage($scope.tableID, $scope.page);
+          if (self.tableID) {
+              self.downloadQueueManager.setCurrentPage(self.tableID, $scope.page);
           }
 
           // setup the list of the other pages to link to

@@ -25,6 +25,10 @@ define(function (require) {
         filter: '=?',
       },
       link: function ($scope) {
+        if (!$scope.infiniteScroll){
+            // grab panel ID from kibana panel element 
+            $scope.tableID = $scope.$parent.$parent.$parent.panel.id;
+        }
         var notify = new Notifier();
         $scope.limit = 50;
         $scope.type = 'savedsearch';

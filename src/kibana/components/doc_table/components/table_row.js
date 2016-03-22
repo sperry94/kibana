@@ -40,7 +40,7 @@ define(function (require) {
         filter: '=',
         indexPattern: '=',
         row: '=kbnTableRow',
-        type: '='
+        tableId: '='
       },
       link: function ($scope, $el) {
         $el.after('<tr>');
@@ -175,13 +175,18 @@ define(function (require) {
                 });
             }
           }
-
-          return {
+          
+          var obj = {
               text : text,
               downloadButton : downloadButton,
               row : row,
-              tableID : $scope.tableID
           };
+          
+          if ($scope.tableId) {
+              obj.tableID = $scope.tableId;
+          }
+          return obj;
+
         }
         
         init();

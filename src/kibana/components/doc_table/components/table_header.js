@@ -16,17 +16,12 @@ define(function (require) {
         columns: '=',
         sorting: '=',
         indexPattern: '=',
-        type: '='
+        tableId: '='
       },
       template: headerHtml,
       controller: function ($scope) {
         $scope.downloadQueueManager = DownloadQueueManager;
         $scope.captureSelectModalManager = CaptureSelectModalManager;
-        
-        if ($scope.type && ($scope.type === 'savedsearch')){
-            // sorry... had to grab panel name from parent (x8) scope :(
-            $scope.tableID = $scope.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.panel.id;
-        }
         
   
         var sortableField = function (field) {
