@@ -17,6 +17,7 @@ define(function (require) {
   require('ui-util');
   require('elasticjs');
   require('elasticjs-angular');
+  require('ng-cookies');
 
 
   require('plugins/dashboard/directives/grid');
@@ -28,6 +29,7 @@ define(function (require) {
   var app = require('modules').get('app/dashboard', [
     'elasticsearch',
     'ngRoute',
+    'ipCookie',
     'kibana/courier',
     'kibana/config',
     'kibana/notify',
@@ -47,6 +49,7 @@ define(function (require) {
     }
   })
   .when('/dashboard/:id', {
+    controller: 'DashboardSaveController',
     template: require('text!plugins/dashboard/index.html'),
     resolve: {
       dash: function (savedDashboards, Notifier, $route, $location, courier) {
@@ -57,8 +60,11 @@ define(function (require) {
       }
     }
   });
-
-    app.directive('dashboardApp', function (Notifier, courier, AppState,
+    app.controller('DashboardSaveController', function($scope, $routeParams, 
+        ipCookie) {
+        ipCookie('dashboard', $routeParams.id, {path: '/'});
+    })
+    .directive('dashboardApp', function (Notifier, courier, AppState,
                                             timefilter, kbnUrl, searchAuditor) {
         return {
           link: function(scope, elem) {
