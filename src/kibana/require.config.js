@@ -40,10 +40,11 @@ require.config({
     semver: 'bower_components/semver/semver.browser',
     
     // Libraries Installed through NetMon
-    restangular: 'netmon_libs/restangular.min',
-    'ui-util' : 'netmon_libs/ui-utils.min',
-    'elasticjs-angular' : 'netmon_libs/elastic-angular-client.min',
-     elasticjs : 'netmon_libs/elastic.min',
+    restangular: 'netmon_libs/thirdParty/restangular.min',
+    'ui-util' : 'netmon_libs/thirdParty/ui-utils.min',
+    'elasticjs-angular' : 'netmon_libs/thirdParty/elastic-angular-client.min',
+     elasticjs : 'netmon_libs/thirdParty/elastic.min',
+    'ng-cookies' : 'netmon_libs/thirdParty/angular-cookie.min',
      fieldmap : 'netmon_libs/fieldMap'
   },
   shim: {
