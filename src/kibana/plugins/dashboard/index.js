@@ -61,7 +61,7 @@ define(function (require) {
     }
   });
     app.controller('DashboardSaveController', function($scope, $routeParams, 
-        ipCookie) {
+        $location, ipCookie) {
         ipCookie('dashboard', $routeParams.id, {path: '/'});
     })
     .directive('dashboardApp', function (Notifier, courier, AppState,
@@ -139,7 +139,10 @@ define(function (require) {
           if (dash.id) {
             docTitle.change(dash.title);
           }
-
+          var params = $location.search();
+          if (params.query){
+              $state.query.query_string.query = params.query;
+          }
           $scope.$emit('application.load');
         }
 
