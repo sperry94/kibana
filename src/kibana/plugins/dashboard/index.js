@@ -133,8 +133,6 @@ define(function (require) {
         courier.setRootSearchSource(dash.searchSource);
 
         function init() {
-            
-          
           updateQueryOnRootSource();
 
           var docTitle = Private(require('components/doc_title/doc_title'));
