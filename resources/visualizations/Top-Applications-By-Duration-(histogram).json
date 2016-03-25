@@ -4,6 +4,6 @@
    "description": "",
    "version": 1,
    "kibanaSavedObjectMeta": {
-      "searchSourceJSON": "{\"index\":\"network_*\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
+      "searchSourceJSON": "{\"index\":\"[network_]YYYY_MM_DD\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
    }
 }
