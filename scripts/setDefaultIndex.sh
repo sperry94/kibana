@@ -32,9 +32,9 @@ index_pattern_exists=$?
 if [ "$index_pattern_exists" -eq "0"  ]; then
    echo `date +'%D %T'` "  Index pattern \"[network_]YYYY_MM_DD\" DOES NOT exist. Creating it now..." >> $KIBANA_LOG_FILE
    echo `date +'%D %T'` "  POST returned:"                                                            >> $KIBANA_LOG_FILE
-   $CURL -XPOST "$KIBANA_PREFIX""$INDEX_PATTERN""$CREATE""$PRETTY" -d "$INDEX_PATTERN_SPEC" >> $KIBANA_LOG_FILE
+   $CURL -XPOST "$KIBANA_PREFIX""$INDEX_PATTERN""$CREATE""$PRETTY" -d "$INDEX_PATTERN_SPEC"           >> $KIBANA_LOG_FILE
    echo `date +'%D %T'` "  Result of -> curl -XGET $KIBANA_PREFIX$INDEX_PATTERN$PRETTY:"              >> $KIBANA_LOG_FILE
-   $CURL -XGET "$KIBANA_PREFIX""$INDEX_PATTERN""$PRETTY"                                    >> $KIBANA_LOG_FILE
+   $CURL -XGET "$KIBANA_PREFIX""$INDEX_PATTERN""$PRETTY"                                              >> $KIBANA_LOG_FILE
 else
    echo `date +'%D %T'` "  Index pattern \"[network_]YYYY_MM_DD\" ALREADY EXISTS."                    >> $KIBANA_LOG_FILE
 fi
@@ -57,26 +57,26 @@ fi
 $CURL -XGET "$KIBANA_PREFIX""$INDEX_PATTERN" | grep "$SILENT" "fieldFormatMap"
 field_format_map_exists=$?
 if [ "$field_format_map_exists" -ne "0" ]; then
-   echo `date +'%D %T'` "  Custom fieldFormatMap doesn't exist. Creating it..."            >> $KIBANA_LOG_FILE
-   echo `date +'%D %T'` "  POST returned:"                                                 >> $KIBANA_LOG_FILE
-   $CURL -XPOST "$KIBANA_PREFIX""$INDEX_PATTERN""$UPDATE" "$JSON_FLAG" @$MAPPINGS           >> $KIBANA_LOG_FILE
-   echo `date +'%D %T'` "  Result of -> curl -XGET $KIBANA_PREFIX$INDEX_PATTERN$PRETTY:"   >> $KIBANA_LOG_FILE
-   $CURL -XGET "$KIBANA_PREFIX""$INDEX_PATTERN""$PRETTY"                                    >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  Custom fieldFormatMap doesn't exist. Creating it..."                       >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  POST returned:"                                                            >> $KIBANA_LOG_FILE
+   $CURL -XPOST "$KIBANA_PREFIX""$INDEX_PATTERN""$UPDATE" "$JSON_FLAG" @$MAPPINGS                     >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  Result of -> curl -XGET $KIBANA_PREFIX$INDEX_PATTERN$PRETTY:"              >> $KIBANA_LOG_FILE
+   $CURL -XGET "$KIBANA_PREFIX""$INDEX_PATTERN""$PRETTY"                                              >> $KIBANA_LOG_FILE
 else
-   echo `date +'%D %T'` "  Custom fieldFormatMap already exists."                          >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  Custom fieldFormatMap already exists."                                     >> $KIBANA_LOG_FILE
 fi
 
 # Specify for our $VER config that the default index should be the newly created "[network_]YYYY_MM_DD" index pattern
 $CURL "$XHEAD_PARAMS" -XHEAD "$KIBANA_PREFIX""$CONFIG" | grep "$SILENT" "$NOT_FOUND"
 config_exists=$?
 if [ "$config_exists" -eq "0"  ]; then
-   echo `date +'%D %T'` "  Config record for $VER DOES NOT exist. Creating it now..."      >> $KIBANA_LOG_FILE
-   echo `date +'%D %T'` "  POST returned:"                                                 >> $KIBANA_LOG_FILE
-   $CURL -XPOST "$KIBANA_PREFIX""$CONFIG""$CREATE""$PRETTY" "$JSON_FLAG" "$DEFAULT_INDEX"   >> $KIBANA_LOG_FILE
-   echo `date +'%D %T'` "  Result of -> curl -XGET $KIBANA_PREFIX$CONFIG$PRETTY:"          >> $KIBANA_LOG_FILE
-   $CURL -XGET "$KIBANA_PREFIX""$CONFIG""$PRETTY"                                           >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  Config record for $VER DOES NOT exist. Creating it now..."                 >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  POST returned:"                                                            >> $KIBANA_LOG_FILE
+   $CURL -XPOST "$KIBANA_PREFIX""$CONFIG""$CREATE""$PRETTY" "$JSON_FLAG" "$DEFAULT_INDEX"             >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  Result of -> curl -XGET $KIBANA_PREFIX$CONFIG$PRETTY:"                     >> $KIBANA_LOG_FILE
+   $CURL -XGET "$KIBANA_PREFIX""$CONFIG""$PRETTY"                                                     >> $KIBANA_LOG_FILE
 else
-   echo `date +'%D %T'` "  Config record for $VER ALREADY EXISTS."                         >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  Config record for $VER ALREADY EXISTS."                                    >> $KIBANA_LOG_FILE
 fi
 
 # If you stop XDELETE the kibana index while kibana is still running, it can rebuild the
@@ -86,11 +86,11 @@ fi
 $CURL -XGET "$KIBANA_PREFIX""$CONFIG" | grep "$SILENT" '\"defaultIndex\":\"\[network_\]YYYY_MM_DD\"'
 config_has_default_index=$?
 if [ "$config_has_default_index" -ne "0" ]; then
-   echo `date +'%D %T'` "  Config for $VER exists, but no default index is specified"      >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  Config for $VER exists, but no default index is specified"                 >> $KIBANA_LOG_FILE
    echo `date +'%D %T'` "  Updating config/$VER record with default index \"[network_]YYYY_MM_DD\""   >> $KIBANA_LOG_FILE
-   $CURL -XPOST "$KIBANA_PREFIX""$CONFIG""$UPDATE""$PRETTY" "$JSON_FLAG" "{\"doc\": $DEFAULT_INDEX}" >> $KIBANA_LOG_FILE
-   echo `date +'%D %T'` "  Result of -> curl -XGET $KIBANA_PREFIX$CONFIG$PRETTY:"          >> $KIBANA_LOG_FILE
-   $CURL -XGET "$KIBANA_PREFIX""$CONFIG""$PRETTY"                                           >> $KIBANA_LOG_FILE
+   $CURL -XPOST "$KIBANA_PREFIX""$CONFIG""$UPDATE""$PRETTY" "$JSON_FLAG" "{\"doc\": $DEFAULT_INDEX}"  >> $KIBANA_LOG_FILE
+   echo `date +'%D %T'` "  Result of -> curl -XGET $KIBANA_PREFIX$CONFIG$PRETTY:"                     >> $KIBANA_LOG_FILE
+   $CURL -XGET "$KIBANA_PREFIX""$CONFIG""$PRETTY"                                                     >> $KIBANA_LOG_FILE
 else
    echo `date +'%D %T'` "  defaultIndex parameter for index pattern \"[network_]YYYY_MM_DD\" is set"  >> $KIBANA_LOG_FILE
 fi
