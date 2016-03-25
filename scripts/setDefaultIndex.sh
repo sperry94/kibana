@@ -3,7 +3,7 @@
 ES_HEAD="localhost:9200"
 KIBANA_PREFIX="$ES_HEAD/.kibana"
 INDEX_PATTERN="/index-pattern/[network_]YYYY_MM_DD"
-INDEX_PATTERN_SPEC="{\"title\": \"[network_]YYYY_MM_DD\", \"timeFieldName\": \"TimeUpdated\"}"
+INDEX_PATTERN_SPEC="{\"title\": \"[network_]YYYY_MM_DD\", \"timeFieldName\": \"TimeUpdated\", \"intervalName\":\"days\"}"
 DEFAULT_INDEX="{\"defaultIndex\":\"[network_]YYYY_MM_DD\"}"
 VER="4.1.4"
 CONFIG="/config/$VER"
