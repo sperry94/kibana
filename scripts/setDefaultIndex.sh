@@ -27,7 +27,7 @@ if [ ! -e $KIBANA_LOG_FILE ]; then
 fi
 
 # Create the index pattern and specify TimeUpdated as the default time parameter
-$CURL "$XHEAD_PARAMS" -XHEAD "$KIBANA_PREFIX""$INDEX_PATTERN" | grep "$SILENT" "$NOT_FOUND"
+curl -g -i -XHEAD localhost:9200/.kibana/index-pattern/[network_]YYYY_MM_DD | grep -q "404"
 index_pattern_exists=$?
 if [ "$index_pattern_exists" -eq "0"  ]; then
    echo `date +'%D %T'` "  Index pattern \"[network_]YYYY_MM_DD\" DOES NOT exist. Creating it now..." >> $KIBANA_LOG_FILE
