@@ -35,6 +35,7 @@ cp init/kibana.conf %{buildroot}/etc/init
 cp -r resources/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 cp scripts/setDefaultIndex.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 cp scripts/loadAssets.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
+cp scripts/refreshKibanaIndex.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 
 %post
 link=/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
