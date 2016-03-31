@@ -27,7 +27,8 @@ if [ ! -e $KIBANA_LOG_FILE ]; then
 fi
 
 # Create the index pattern and specify TimeUpdated as the default time parameter
-index_pattern_exists=`curl -g -i -XHEAD localhost:9200/.kibana/index-pattern/[network_]YYYY_MM_DD | grep "200"`
+index_pattern_result=$(curl -g -i -XHEAD localhost:9200/.kibana/index-pattern/[network_]YYYY_MM_DD)
+echo "$index_pattern_result" | grep "200"
 if [ $? -ne 0  ]; then
    echo `date +'%D %T'` "  Index pattern \"[network_]YYYY_MM_DD\" DOES NOT exist. Creating it now..." >> $KIBANA_LOG_FILE
    echo `date +'%D %T'` "  POST returned:"                                                            >> $KIBANA_LOG_FILE
@@ -36,9 +37,9 @@ if [ $? -ne 0  ]; then
    $CURL -XGET "$KIBANA_PREFIX""$INDEX_PATTERN""$PRETTY"                                              >> $KIBANA_LOG_FILE
 else
    echo `date +'%D %T'` "  Index pattern \"[network_]YYYY_MM_DD\" ALREADY EXISTS."                    >> $KIBANA_LOG_FILE
-   echo `date +'%D %T'` "  Index pattern curl command returned:"                                      >> $KIBANA_LOG_FILE
-   echo `date +'%D %T'` "  $index_pattern_exists"                                                     >> $KIBANA_LOG_FILE
 fi
+echo `date +'%D %T'` "  Result of curl for index pattern:"                                            >> $KIBANA_LOG_FILE
+echo `date +'%D %T'` "  $index_pattern_result"                                                        >> $KIBANA_LOG_FILE
 
 # Check for our custom field mappings
 #
