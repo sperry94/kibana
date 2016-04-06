@@ -1,4 +1,4 @@
-# File: defaultIndex.py
+# File: setDefaultIndex.py
 #
 # Author: Craig Cogdill
 
