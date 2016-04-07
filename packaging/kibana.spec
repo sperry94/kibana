@@ -45,11 +45,13 @@ if [ ! -L $link ]; then
 fi
 
 if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/setDefaultIndex.sh ]; then
-
-echo "The file exists!!!!" > /tmp/craig.out
-
-
+   rm /usr/local/%{name}-%{kibana_version}-linux-x64/setDefaultIndex.sh
 fi
+
+if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/loadAssets.sh ]; then
+   rm /usr/local/%{name}-%{kibana_version}-linux-x64/loadAssets.sh
+fi
+
 %postun
 
 %files
