@@ -3,13 +3,18 @@
 # Author: Craig Cogdill
 
 import logging
+import logging.handlers
 import json
 import time
 from elasticsearch import Elasticsearch
-logging.basicConfig(filename="/var/log/probe/pythonKibanaStartup.log",
+log_filename = "/var/log/probe/pythonKibanaStartup.log"
+logging.basicConfig(filename=log_filename,
                     level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s:  %(message)s',
                     datefmt='%Y/%m/%d %H:%M:%S')
+rotating_handler = logging.handlers.RotatingFileHandler(log_filename, 
+                                                        maxBytes=10485760,
+                                                        backupCount=5)
 es = Elasticsearch()
 localhost="localhost:9200"
 nm_index_pattern='[network_]YYYY_MM_DD'

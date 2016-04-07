@@ -1,4 +1,4 @@
-# File: setDefaultIndex.py
+# File: loadAssets.py
 #
 # Author: Craig Cogdill
 
@@ -32,12 +32,6 @@ search_type = "search"
 
 kibana_index = ".kibana"
 indent_level = 3
-
-def format_for_update(content):
-    return "{ \"doc\": " + str(json.dumps(content)) + " }"
-
-def update_document(es_index, es_type, es_id, content):
-    return json.dumps(es.update(index=es_index, doc_type=es_type, id=es_id, body=content))
 
 def create_document(es_index, es_type, es_id, es_body):
     return json.dumps(es.create(index=es_index,
