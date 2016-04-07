@@ -1,7 +1,6 @@
 define(function (require) {
   var _ = require('lodash');
   var angular = require('angular');
-  require('plugins/dashboard/components/modal/modal');
   require('angular-bootstrap');
   var app = require('modules').get('netmon/download', ['ui.bootstrap']);
   

@@ -1,9 +1,9 @@
 define(function (require) {
    
     var app = require('modules').get('app/dashboard');
-    require('plugins/dashboard/components/modal/validators');
-    require('plugins/dashboard/components/modal/kbnIndexService');
-    require('plugins/dashboard/components/modal/ElasticSearchFields');
+    require('netmon_libs/custom_modules/save_rule/services/validators');
+    require('netmon_libs/custom_modules/save_rule/services/kbnIndexService');
+    require('netmon_libs/custom_modules/save_rule/services/ElasticSearchFields');
     
     var moment = require('moment');
     var angular = require('angular');

@@ -10,7 +10,8 @@ define(function (require) {
   require('components/notify/notify');
   require('components/typeahead/typeahead');
   require('components/clipboard/clipboard');
-  require('plugins/dashboard/components/modal/modal');
+  require('netmon_libs/custom_modules/save_rule/modal/modal');
+  require('netmon_libs/custom_modules/save_rule/services/saveRuleManager');
   require('angular-bootstrap');
   
   // NetMon Non-Kibana Libraries 
@@ -22,7 +23,7 @@ define(function (require) {
 
   require('plugins/dashboard/directives/grid');
   require('plugins/dashboard/components/panel/panel');
-  require('plugins/dashboard/components/modal/searchAuditor');
+  require('netmon_libs/custom_modules/save_rule/services/searchAuditor');
   require('plugins/dashboard/services/saved_dashboards');
   require('css!plugins/dashboard/styles/main.css');
 
@@ -82,7 +83,8 @@ define(function (require) {
                                          datemath.parse(scope.timefilter.time.to));
               });
           },
-        controller: function ($scope, $route, $routeParams, $location, $http, configFile, Private, getAppState, $modal) {
+        controller: function ($scope, $route, $routeParams, $location, $http, configFile, Private, getAppState, saveRuleManager) {
+        $scope.saveRuleManager = saveRuleManager;
         var queryFilter = Private(require('components/filter_bar/query_filter'));
 
         var notify = new Notifier({
@@ -237,20 +239,6 @@ define(function (require) {
             };
           }
         };
-        
-        $scope.openSaveRuleModal = function (query) {
-      
-           var modalInstance = $modal.open({
-              animation: $scope.animationsEnabled,
-              templateUrl: 'plugins/dashboard/components/modal/save-rule.html',
-              controller: 'SaveRuleController',
-              resolve: {
-               query: function () {
-                  return query;
-               }
-              }
-           });
-      };
 
         init();
       }
