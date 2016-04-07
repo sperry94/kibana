@@ -33,8 +33,8 @@ mkdir -p %{buildroot}/etc/init
 tar xvf target/%{name}-%{kibana_version}-linux-x64.tar.gz -C %{buildroot}/usr/local/
 cp init/kibana.conf %{buildroot}/etc/init
 cp -r resources/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
-cp scripts/setDefaultIndex.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
-cp scripts/loadAssets.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
+cp scripts/setDefaultIndex.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
+cp scripts/loadAssets.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 cp scripts/refreshKibanaIndex.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 
 %post
@@ -42,6 +42,13 @@ link=/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
 if [ ! -L $link ]; then
    ln -s /usr/local/%{name}-%{kibana_version}-linux-x64 $link
    sudo chown -R  nginx:nginx $link
+fi
+
+if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/setDefaultIndex.sh ]; then
+
+echo "The file exists!!!!" > /tmp/craig.out
+
+
 fi
 %postun
 
