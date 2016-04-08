@@ -15,7 +15,7 @@ logging.basicConfig(filename=log_filename,
 rotating_handler = logging.handlers.RotatingFileHandler(log_filename, 
                                                         maxBytes=10485760,
                                                         backupCount=5)
-es = Elasticsearch()
+es = Elasticsearch(timeout=5, max_retries=5, retry_on_timeout=True)
 localhost="localhost:9200"
 nm_index_pattern='[network_]YYYY_MM_DD'
 default_index='"defaultIndex": \"%s\"' % nm_index_pattern
@@ -75,8 +75,8 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
     document_exists = es.exists(index=es_index, doc_type=es_type, id=es_id)
     if (not document_exists):
         logging.info('Document %s/%s/%s/%s does not exist. Creating it now...', localhost, es_index, es_type, es_id)
-        create_document = create_document(es_index, es_type, es_id, es_body)
-        logging.info("Create document returns: \n %s", create_document)
+        document_created = create_document(es_index, es_type, es_id, es_body)
+        logging.info("Create document returns: \n %s", document_created)
         return created
     else:
         logging.info("Document %s/%s/%s/%s already exists.", localhost, es_index, es_type, es_id)

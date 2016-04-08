@@ -51,6 +51,10 @@ if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/loadAssets.sh ]; then
    rm /usr/local/%{name}-%{kibana_version}-linux-x64/loadAssets.sh
 fi
 
+if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/refreshKibanaIndex.sh ]; then
+   rm /usr/local/%{name}-%{kibana_version}-linux-x64/refreshKibanaIndex.sh
+fi
+
 %postun
 
 %files

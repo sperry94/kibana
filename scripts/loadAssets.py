@@ -17,7 +17,7 @@ logging.basicConfig(filename=log_filename,
 rotating_handler = logging.handlers.RotatingFileHandler(log_filename, 
                                                         maxBytes=10485760,
                                                         backupCount=5)
-es = Elasticsearch()
+es = Elasticsearch(timeout=5, max_retries=5, retry_on_timeout=True)
 
 kibana_version = "4.1.4"
 
@@ -97,7 +97,7 @@ searches = [file for file in listdir(searches_path) if isfile(join(searches_path
 # Load all the artifacts appropriately
 logging.debug("================================== DASHBOARDS ==================================")
 load_assets(kibana_index, dashboard_type, dashboards_path, dashboards)
-# logging.debug("================================== VISUALIZATIONS ==================================")
-# load_assets(kibana_index, visualization_type, visualizations_path, visualizations)
-# logging.debug("================================== SEARCHES ==================================")
-# load_assets(kibana_index, search_type, searches_path, searches)
+logging.debug("================================== VISUALIZATIONS ==================================")
+load_assets(kibana_index, visualization_type, visualizations_path, visualizations)
+logging.debug("================================== SEARCHES ==================================")
+load_assets(kibana_index, search_type, searches_path, searches)
