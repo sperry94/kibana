@@ -17,7 +17,7 @@ logging.basicConfig(filename=log_filename,
 rotating_handler = logging.handlers.RotatingFileHandler(log_filename, 
                                                         maxBytes=10485760,
                                                         backupCount=5)
-es = Elasticsearch(timeout=5, max_retries=5, retry_on_timeout=True)
+es = Elasticsearch(max_retries=5, retry_on_timeout=True)
 
 kibana_version = "4.1.4"
 
@@ -37,7 +37,8 @@ def create_document(es_index, es_type, es_id, es_body):
     return json.dumps(es.create(index=es_index,
                                 doc_type=es_type,
                                 id=es_id,
-                                body=es_body),
+                                body=es_body,
+                                request_timeout=10),
                       indent=indent_level)
 
 def create_document_from_file(es_index, es_type, es_id, path_to_updated_json):
@@ -48,7 +49,7 @@ def get_es_id(filename):
     return splitext(filename)[0]
 
 def delete_document(es_index, es_type, es_id):
-    es.delete(es_index, es_type, es_id)
+    es.delete(es_index, es_type, es_id, request_timeout=10)
 
 def read_json_from_file(file):
     with open(file) as file_raw:    
@@ -62,7 +63,7 @@ def update_existing_document(es_index, es_type, es_id, path_to_updated_json):
     create_document_from_file(es_index, es_type, es_id, path_to_updated_json)
 
 def get_request_as_json(es_index, es_type, es_id):
-    return json.loads(json.dumps(es.get(index=es_index, doc_type=es_type, id=es_id)))
+    return json.loads(json.dumps(es.get(index=es_index, doc_type=es_type, id=es_id, request_timeout=10)))
 
 
 def load_assets(es_index, es_type, path_to_files, files):
@@ -70,7 +71,7 @@ def load_assets(es_index, es_type, path_to_files, files):
         logging.debug("--------- " + file + " ---------")
         full_file_path = path_to_files + "/" + file
         es_id = get_es_id(file)
-        if (es.exists(index=es_index, doc_type=es_type, id=es_id)):
+        if (es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=10)):
             get_response_json = get_request_as_json(es_index, es_type, es_id)
             version_of_disk_file = get_version_of_file(full_file_path)
             version_of_es_file = get_response_json['_source']['version']
@@ -88,16 +89,20 @@ def load_assets(es_index, es_type, path_to_files, files):
 
 
 # ----------------- MAIN -----------------
+def main():
 
-# Create arrays of the filenames in each of the resource dirs
-dashboards = [file for file in listdir(dashboards_path) if isfile(join(dashboards_path, file))]
-visualizations = [file for file in listdir(visualizations_path) if isfile(join(visualizations_path, file))]
-searches = [file for file in listdir(searches_path) if isfile(join(searches_path, file))]
+    # Create arrays of the filenames in each of the resource dirs
+    dashboards = [file for file in listdir(dashboards_path) if isfile(join(dashboards_path, file))]
+    visualizations = [file for file in listdir(visualizations_path) if isfile(join(visualizations_path, file))]
+    searches = [file for file in listdir(searches_path) if isfile(join(searches_path, file))]
 
-# Load all the artifacts appropriately
-logging.debug("================================== DASHBOARDS ==================================")
-load_assets(kibana_index, dashboard_type, dashboards_path, dashboards)
-logging.debug("================================== VISUALIZATIONS ==================================")
-load_assets(kibana_index, visualization_type, visualizations_path, visualizations)
-logging.debug("================================== SEARCHES ==================================")
-load_assets(kibana_index, search_type, searches_path, searches)
+    # Load all the artifacts appropriately
+    logging.debug("================================== DASHBOARDS ==================================")
+    load_assets(kibana_index, dashboard_type, dashboards_path, dashboards)
+    logging.debug("================================== VISUALIZATIONS ==================================")
+    load_assets(kibana_index, visualization_type, visualizations_path, visualizations)
+    logging.debug("================================== SEARCHES ==================================")
+    load_assets(kibana_index, search_type, searches_path, searches)
+
+if __name__ == '__main__':
+    main()

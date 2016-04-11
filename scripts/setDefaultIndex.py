@@ -15,7 +15,7 @@ logging.basicConfig(filename=log_filename,
 rotating_handler = logging.handlers.RotatingFileHandler(log_filename, 
                                                         maxBytes=10485760,
                                                         backupCount=5)
-es = Elasticsearch(timeout=5, max_retries=5, retry_on_timeout=True)
+es = Elasticsearch(max_retries=5, retry_on_timeout=True)
 localhost="localhost:9200"
 nm_index_pattern='[network_]YYYY_MM_DD'
 default_index='"defaultIndex": \"%s\"' % nm_index_pattern
@@ -40,12 +40,13 @@ def format_for_update(content):
     return "{ \"doc\": " + str(json.dumps(content)) + " }"
 
 def update_document(es_index, es_type, es_id, content):
-    return json.dumps(es.update(index=es_index, doc_type=es_type, id=es_id, body=content))
+    return json.dumps(es.update(index=es_index, doc_type=es_type, id=es_id, body=content, request_timeout=10))
 
 def search_index_and_type(es_index, es_type, query):
     search_response_raw = json.dumps(es.search(index=es_index,
                                                doc_type=es_type,
-                                               q=query),
+                                               q=query,
+                                               request_timeout=10),
                                      indent=indent_level)
     search_response_json = json.loads(search_response_raw)
     search_number_of_hits = search_response_json['hits']['total']
@@ -68,11 +69,12 @@ def create_document(es_index, es_type, es_id, es_body):
     return json.dumps(es.create(index=es_index,
                                 doc_type=es_type,
                                 id=es_id,
-                                body=es_body),
+                                body=es_body,
+                                request_timeout=10),
                       indent=indent_level)
 
 def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
-    document_exists = es.exists(index=es_index, doc_type=es_type, id=es_id)
+    document_exists = es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=10)
     if (not document_exists):
         logging.info('Document %s/%s/%s/%s does not exist. Creating it now...', localhost, es_index, es_type, es_id)
         document_created = create_document(es_index, es_type, es_id, es_body)
@@ -88,44 +90,47 @@ def sleep_if_necessary(need_to_sleep):
         time.sleep(1)
 
 # ----------------- MAIN -----------------
-logging.debug("================================== INDEX PATTERN ==================================")
-index_pattern_doc_created = create_document_if_it_doesnt_exist(kibana_index,
+def main():
+    logging.debug("================================== INDEX PATTERN ==================================")
+    index_pattern_doc_created = create_document_if_it_doesnt_exist(kibana_index,
+                                                                   index_pattern_type,
+                                                                   nm_index_pattern,
+                                                                   index_pattern_content)
+    sleep_if_necessary(index_pattern_doc_created) # ES doesn't show the index-pattern updates immediately after inserting them
+    index_pattern_missing_fields = verify_document_for_content(kibana_index,
                                                                index_pattern_type,
-                                                               nm_index_pattern,
                                                                index_pattern_content)
-sleep_if_necessary(index_pattern_doc_created) # ES doesn't show the index-pattern updates immediately after inserting them
-index_pattern_missing_fields = verify_document_for_content(kibana_index,
-                                                           index_pattern_type,
-                                                           index_pattern_content)
-if (len(index_pattern_missing_fields) > 0):
-    logging.info("Updating Network Monitor index-pattern with missing fields: ")
-    for key in index_pattern_missing_fields:
-        logging.info("      " + key + ":    " + config_missing_fields[key])
-    update_document(kibana_index,
-                    index_pattern_type,
-                    nm_index_pattern,
-                    format_for_update(index_pattern_missing_fields))
-else:
-    logging.info("No missing index-pattern fields.")
+    if (len(index_pattern_missing_fields) > 0):
+        logging.info("Updating Network Monitor index-pattern with missing fields: ")
+        for key in index_pattern_missing_fields:
+            logging.info("      " + key + ":    " + config_missing_fields[key])
+        update_document(kibana_index,
+                        index_pattern_type,
+                        nm_index_pattern,
+                        format_for_update(index_pattern_missing_fields))
+    else:
+        logging.info("No missing index-pattern fields.")
 
-logging.debug("================================== " + kibana_version + " CONFIG ==================================")
-config_doc_created = create_document_if_it_doesnt_exist(kibana_index,
+    logging.debug("================================== " + kibana_version + " CONFIG ==================================")
+    config_doc_created = create_document_if_it_doesnt_exist(kibana_index,
+                                                            config_type,
+                                                            kibana_version,
+                                                            version_config_content)
+    sleep_if_necessary(config_doc_created) # ES doesn't show the updates immediately after inserting them
+    config_missing_fields = verify_document_for_content(kibana_index,
                                                         config_type,
-                                                        kibana_version,
                                                         version_config_content)
-sleep_if_necessary(config_doc_created) # ES doesn't show the updates immediately after inserting them
-config_missing_fields = verify_document_for_content(kibana_index,
-                                                    config_type,
-                                                    version_config_content)
-if (len(config_missing_fields) > 0):
-    logging.info("Updating " + kibana_version + " config with missing fields:   ")
-    for key in config_missing_fields:
-        logging.info("      " + key + ":    " + config_missing_fields[key])
-    update_document(kibana_index,
-                    index_pattern_type,
-                    nm_index_pattern,
-                    format_for_update(config_missing_fields))
-else:
-    logging.info("No missing " + kibana_version + " config fields.")
+    if (len(config_missing_fields) > 0):
+        logging.info("Updating " + kibana_version + " config with missing fields:   ")
+        for key in config_missing_fields:
+            logging.info("      " + key + ":    " + config_missing_fields[key])
+        update_document(kibana_index,
+                        index_pattern_type,
+                        nm_index_pattern,
+                        format_for_update(config_missing_fields))
+    else:
+        logging.info("No missing " + kibana_version + " config fields.")
 
 
+if __name__ == '__main__':
+    main()
