@@ -7,7 +7,7 @@ import logging.handlers
 import json
 import time
 from elasticsearch import Elasticsearch
-log_filename = "/var/log/probe/pythonKibanaStartup.log"
+log_filename = "/var/log/probe/KibanaStartup.log"
 logging.basicConfig(filename=log_filename,
                     level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s:  %(message)s',

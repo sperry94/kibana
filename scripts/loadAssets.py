@@ -9,7 +9,7 @@ import time
 from elasticsearch import Elasticsearch
 from os import listdir
 from os.path import isfile, join, splitext
-log_filename = "/var/log/probe/pythonKibanaStartup.log"
+log_filename = "/var/log/probe/KibanaStartup.log"
 logging.basicConfig(filename=log_filename,
                     level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s:  %(message)s',
