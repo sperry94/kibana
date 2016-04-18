@@ -8,6 +8,7 @@ import json
 import time
 from elasticsearch import Elasticsearch
 log_filename = "/var/log/probe/KibanaStartup.log"
+es_request_timeout = 30
 logging.basicConfig(filename=log_filename,
                     level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s:  %(message)s',
@@ -48,13 +49,13 @@ def format_for_update(content):
     return "{ \"doc\": " + str(json.dumps(content)) + " }"
 
 def update_document(es_index, es_type, es_id, content):
-    return json.dumps(es.update(index=es_index, doc_type=es_type, id=es_id, body=content, request_timeout=10))
+    return json.dumps(es.update(index=es_index, doc_type=es_type, id=es_id, body=content, request_timeout=es_request_timeout))
 
 def search_index_and_type(es_index, es_type, query):
     search_response_raw = json.dumps(es.search(index=es_index,
                                                doc_type=es_type,
                                                q=query,
-                                               request_timeout=10),
+                                               request_timeout=es_request_timeout),
                                      indent=indent_level)
     search_response_json = json.loads(search_response_raw)
     hits_json = safe_list_read(search_response_json, 'hits')
@@ -79,11 +80,11 @@ def create_document(es_index, es_type, es_id, es_body):
                                 doc_type=es_type,
                                 id=es_id,
                                 body=es_body,
-                                request_timeout=10),
+                                request_timeout=es_request_timeout),
                       indent=indent_level)
 
 def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
-    document_exists = es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=10)
+    document_exists = es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=es_request_timeout)
     if not document_exists:
         logging.info('Document %s/%s/%s/%s does not exist. Creating it now...', localhost, es_index, es_type, es_id)
         document_created = create_document(es_index, es_type, es_id, es_body)

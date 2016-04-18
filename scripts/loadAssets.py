@@ -10,6 +10,7 @@ from elasticsearch import Elasticsearch
 from os import listdir
 from os.path import isfile, join, splitext
 log_filename = "/var/log/probe/KibanaStartup.log"
+es_request_timeout = 30
 logging.basicConfig(filename=log_filename,
                     level=logging.DEBUG,
                     format='%(asctime)s %(levelname)s:  %(message)s',
@@ -38,7 +39,7 @@ def create_document(es_index, es_type, es_id, es_body):
                                 doc_type=es_type,
                                 id=es_id,
                                 body=es_body,
-                                request_timeout=10),
+                                request_timeout=es_request_timeout),
                       indent=indent_level)
 
 def create_document_from_file(es_index, es_type, es_id, path_to_updated_json):
@@ -49,7 +50,7 @@ def get_es_id(filename):
     return splitext(filename)[0]
 
 def delete_document(es_index, es_type, es_id):
-    es.delete(es_index, es_type, es_id, request_timeout=10)
+    es.delete(es_index, es_type, es_id, request_timeout=es_request_timeout)
 
 def read_json_from_file(file):
     with open(file) as file_raw:    
@@ -73,7 +74,7 @@ def update_existing_document(es_index, es_type, es_id, path_to_updated_json):
     create_document_from_file(es_index, es_type, es_id, path_to_updated_json)
 
 def get_request_as_json(es_index, es_type, es_id):
-    return json.loads(json.dumps(es.get(index=es_index, doc_type=es_type, id=es_id, request_timeout=10)))
+    return json.loads(json.dumps(es.get(index=es_index, doc_type=es_type, id=es_id, request_timeout=es_request_timeout)))
 
 
 def load_assets(es_index, es_type, path_to_files, files):
@@ -81,7 +82,7 @@ def load_assets(es_index, es_type, path_to_files, files):
         logging.debug("--------- " + file + " ---------")
         full_file_path = path_to_files + "/" + file
         es_id = get_es_id(file)
-        if es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=10):
+        if es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=es_request_timeout):
             get_response_json = get_request_as_json(es_index, es_type, es_id)
             version_of_disk_file = get_version_of_file(full_file_path)
             es_file_source = safe_list_read(get_response_json, '_source')
