@@ -36,6 +36,14 @@ version_config_content = {
     "defaultIndex": "[network_]YYYY_MM_DD"
 }
 
+def safe_list_read(l, idx):
+    try:
+        thing = l[idx]
+        return thing
+    except:
+        logging.warning("No element in list for index: " + idx)
+        return "" 
+
 def format_for_update(content):
     return "{ \"doc\": " + str(json.dumps(content)) + " }"
 
@@ -49,7 +57,8 @@ def search_index_and_type(es_index, es_type, query):
                                                request_timeout=10),
                                      indent=indent_level)
     search_response_json = json.loads(search_response_raw)
-    search_number_of_hits = search_response_json['hits']['total']
+    hits_json = safe_list_read(search_response_json, 'hits')
+    search_number_of_hits = safe_list_read(hits_json, 'total')
     return search_number_of_hits
 
 def verify_document_for_content(es_index, es_type, content):

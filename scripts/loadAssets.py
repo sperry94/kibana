@@ -55,8 +55,22 @@ def read_json_from_file(file):
     with open(file) as file_raw:    
         return json.load(file_raw)
 
+def safe_list_read(l, idx):
+    try:
+        thing = l[idx]
+        return thing
+    except:
+        logging.warning("No element in list for index: " + idx)
+        return "" 
+
 def get_version_of_file(file):
-    return read_json_from_file(file)['version']
+    try:
+        file_json = read_json_from_file(file)
+        version_from_file = safe_list_read(file_json, 'version')
+        return version_from_file
+    except:
+        logging.error("There is no version listed for file " + file)
+        return 0
 
 def update_existing_document(es_index, es_type, es_id, path_to_updated_json):
     delete_document(es_index, es_type, es_id)
@@ -74,7 +88,8 @@ def load_assets(es_index, es_type, path_to_files, files):
         if es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=10):
             get_response_json = get_request_as_json(es_index, es_type, es_id)
             version_of_disk_file = get_version_of_file(full_file_path)
-            version_of_es_file = get_response_json['_source']['version']
+            es_file_source = safe_list_read(get_response_json, '_source')
+            version_of_es_file = safe_list_read(es_file_source, 'version')
             if version_of_disk_file > version_of_es_file:
                 logging.info("File \"" + str(file) + "\" is outdated and requires update from version " + str(version_of_es_file) +
                              " to version " + str(version_of_disk_file) + ". Updating it now...")
@@ -84,8 +99,6 @@ def load_assets(es_index, es_type, path_to_files, files):
         else:
             logging.info("File \"" + str(file) + "\" doesn't exist in Elasticsearch. Creating it now...")
             create_document_from_file(es_index, es_type, es_id, full_file_path)
-
-
 
 
 # ----------------- MAIN -----------------
