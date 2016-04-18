@@ -16,7 +16,7 @@ logging.basicConfig(filename=log_filename,
 rotating_handler = logging.handlers.RotatingFileHandler(log_filename, 
                                                         maxBytes=10485760,
                                                         backupCount=5)
-es = Elasticsearch(max_retries=5, retry_on_timeout=True)
+es = Elasticsearch(max_retries=50, retry_on_timeout=True)
 localhost="localhost:9200"
 nm_index_pattern='[network_]YYYY_MM_DD'
 default_index='"defaultIndex": \"%s\"' % nm_index_pattern
