@@ -58,7 +58,7 @@ def verify_document_for_content(es_index, es_type, content):
     for key in content_json.keys():
         query = key + ':' + '"'+ content_json[key] + '"'
         hits = search_index_and_type(es_index, es_type, query)
-        if (hits > 0):
+        if hits > 0:
             logging.debug(str(hits) + " hit(s) for " + str(query) + ".")
         else:
             logging.debug("No hits for " + str(query) + ". Attempting to update index...")
@@ -75,7 +75,7 @@ def create_document(es_index, es_type, es_id, es_body):
 
 def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
     document_exists = es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=10)
-    if (not document_exists):
+    if not document_exists:
         logging.info('Document %s/%s/%s/%s does not exist. Creating it now...', localhost, es_index, es_type, es_id)
         document_created = create_document(es_index, es_type, es_id, es_body)
         logging.info("Create document returns: \n %s", document_created)
@@ -86,7 +86,7 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
 
 
 def sleep_if_necessary(need_to_sleep):
-    if (need_to_sleep):
+    if need_to_sleep:
         time.sleep(1)
 
 # ----------------- MAIN -----------------
@@ -100,7 +100,7 @@ def main():
     index_pattern_missing_fields = verify_document_for_content(kibana_index,
                                                                index_pattern_type,
                                                                index_pattern_content)
-    if (len(index_pattern_missing_fields) > 0):
+    if len(index_pattern_missing_fields) > 0:
         logging.info("Updating Network Monitor index-pattern with missing fields: ")
         for key in index_pattern_missing_fields:
             logging.info("      " + key + ":    " + config_missing_fields[key])
@@ -120,7 +120,7 @@ def main():
     config_missing_fields = verify_document_for_content(kibana_index,
                                                         config_type,
                                                         version_config_content)
-    if (len(config_missing_fields) > 0):
+    if len(config_missing_fields) > 0:
         logging.info("Updating " + kibana_version + " config with missing fields:   ")
         for key in config_missing_fields:
             logging.info("      " + key + ":    " + config_missing_fields[key])

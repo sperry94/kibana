@@ -71,11 +71,11 @@ def load_assets(es_index, es_type, path_to_files, files):
         logging.debug("--------- " + file + " ---------")
         full_file_path = path_to_files + "/" + file
         es_id = get_es_id(file)
-        if (es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=10)):
+        if es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=10):
             get_response_json = get_request_as_json(es_index, es_type, es_id)
             version_of_disk_file = get_version_of_file(full_file_path)
             version_of_es_file = get_response_json['_source']['version']
-            if (version_of_disk_file > version_of_es_file):
+            if version_of_disk_file > version_of_es_file:
                 logging.info("File \"" + str(file) + "\" is outdated and requires update from version " + str(version_of_es_file) +
                              " to version " + str(version_of_disk_file) + ". Updating it now...")
                 update_existing_document(es_index, es_type, es_id, full_file_path)
