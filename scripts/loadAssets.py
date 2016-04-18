@@ -57,20 +57,16 @@ def read_json_from_file(file):
 
 def safe_list_read(l, idx):
     try:
-        thing = l[idx]
-        return thing
+        value = l[idx]
+        return value
     except:
         logging.warning("No element in list for index: " + idx)
         return "" 
 
 def get_version_of_file(file):
-    try:
-        file_json = read_json_from_file(file)
-        version_from_file = safe_list_read(file_json, 'version')
-        return version_from_file
-    except:
-        logging.error("There is no version listed for file " + file)
-        return 0
+    file_json = read_json_from_file(file)
+    version_from_file = safe_list_read(file_json, 'version')
+    return version_from_file
 
 def update_existing_document(es_index, es_type, es_id, path_to_updated_json):
     delete_document(es_index, es_type, es_id)

@@ -38,8 +38,8 @@ version_config_content = {
 
 def safe_list_read(l, idx):
     try:
-        thing = l[idx]
-        return thing
+        value = l[idx]
+        return value
     except:
         logging.warning("No element in list for index: " + idx)
         return "" 
