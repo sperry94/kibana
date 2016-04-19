@@ -9,9 +9,10 @@ import time
 from elasticsearch import Elasticsearch
 log_filename = "/var/log/probe/KibanaStartup.log"
 es_request_timeout = 30
+es_query_timeout = 10
 logging.basicConfig(filename=log_filename,
                     level=logging.DEBUG,
-                    format='%(asctime)s %(levelname)s:  %(message)s',
+                    format='%(asctime)s.%(msecs)03d %(levelname)s:  %(message)s',
                     datefmt='%Y/%m/%d %H:%M:%S')
 rotating_handler = logging.handlers.RotatingFileHandler(log_filename, 
                                                         maxBytes=10485760,
@@ -26,6 +27,7 @@ index_pattern_type = "index-pattern"
 config_type = "config"
 kibana_version = "4.1.4"
 created=True
+verified = 1
 
 index_pattern_content = {
     "title": "[network_]YYYY_MM_DD",
@@ -51,6 +53,24 @@ def format_for_update(content):
 def update_document(es_index, es_type, es_id, content):
     return json.dumps(es.update(index=es_index, doc_type=es_type, id=es_id, body=content, request_timeout=es_request_timeout))
 
+def copy_dict_keys(dict):
+  return dict.fromkeys(dict.keys(), 0)
+
+def time_has_run_out(start, curr, max):
+  logging.warning("START TIME = " + str(start))
+  logging.warning("CURR TIME = " + str(curr))
+  logging.warning(str(curr) + " - " + str(start) + " > " + str(max) + " == " + str(curr-start>max))
+  return curr - start > max
+
+def all_keys_verified(dict):
+  logging.info("  Verifying keys...")
+  all_verified = True
+  for key in dict:
+    logging.info("  Verifying key: " + key + "   --> " + str(dict[key]))
+    all_verified = all_verified and dict[key]
+  logging.info("  all_verified is ...." + str(all_verified))
+  return all_verified
+
 def search_index_and_type(es_index, es_type, query):
     search_response_raw = json.dumps(es.search(index=es_index,
                                                doc_type=es_type,
@@ -62,18 +82,43 @@ def search_index_and_type(es_index, es_type, query):
     search_number_of_hits = safe_list_read(hits_json, 'total')
     return search_number_of_hits
 
-def verify_document_for_content(es_index, es_type, content):
+def add_missing_elements_to_dict(to_verify, original_content):
     missing_elements = {}
-    content_json = json.loads(json.dumps(content))
-    for key in content_json.keys():
-        query = key + ':' + '"'+ content_json[key] + '"'
-        hits = search_index_and_type(es_index, es_type, query)
-        if hits > 0:
-            logging.debug(str(hits) + " hit(s) for " + str(query) + ".")
-        else:
-            logging.debug("No hits for " + str(query) + ". Attempting to update index...")
-            missing_elements[key] = content_json[key]
+    for key in to_verify:
+        if to_verify[key] != verified:
+            logging.debug("No hits for \"" + 
+                          key +
+                          "\":\"" +
+                          original_content[key] +
+                          "\". Adding to list of missing fields...")
+            missing_elements[key] = original_content[key]
     return missing_elements
+
+
+def verify_document_for_content(es_index, es_type, content):
+    start_time = time.time()
+    content_json = json.loads(json.dumps(content))
+    to_verify = copy_dict_keys(content_json)
+    # There is approximately a one second delay between
+    #   when a document is inserted and when it can be
+    #   retrieved. Rather than sleeping for a set amount
+    #   of time and then checking for the document only
+    #   once, we set a timeout period and query elasticsearch
+    #   continuously until the document is retrieved.
+    #
+    #   If the timeout passes and no document has been
+    #   retrieved, we will report that it is missing and
+    #   try to reinsert it.
+    while not all_keys_verified(to_verify) and not time_has_run_out(start_time, time.time(), es_query_timeout):
+        for key in content_json.keys():
+            if to_verify[key] != verified:
+                query = key + ':' + '"'+ content_json[key] + '"'
+                hits = search_index_and_type(es_index, es_type, query)
+                if hits > 0:    
+                    to_verify[key] = verified
+                    logging.debug(str(hits) + " hit(s) for " + str(query) + ".")
+        time.sleep(0.2) # 200ms
+    return add_missing_elements_to_dict(to_verify, content_json)
 
 def create_document(es_index, es_type, es_id, es_body):
     return json.dumps(es.create(index=es_index,
@@ -106,7 +151,6 @@ def main():
                                                                    index_pattern_type,
                                                                    nm_index_pattern,
                                                                    index_pattern_content)
-    sleep_if_necessary(index_pattern_doc_created) # ES doesn't show the index-pattern updates immediately after inserting them
     index_pattern_missing_fields = verify_document_for_content(kibana_index,
                                                                index_pattern_type,
                                                                index_pattern_content)
@@ -126,7 +170,6 @@ def main():
                                                             config_type,
                                                             kibana_version,
                                                             version_config_content)
-    sleep_if_necessary(config_doc_created) # ES doesn't show the updates immediately after inserting them
     config_missing_fields = verify_document_for_content(kibana_index,
                                                         config_type,
                                                         version_config_content)
