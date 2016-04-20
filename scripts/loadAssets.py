@@ -2,22 +2,14 @@
 #
 # Author: Craig Cogdill
 
-import logging
-import logging.handlers
 import json
 import time
 from elasticsearch import Elasticsearch
+from scripts import util
+logging, rotating_handler = util.configure_and_return_logging()
 from os import listdir
 from os.path import isfile, join, splitext
-log_filename = "/var/log/probe/KibanaStartup.log"
 es_request_timeout = 30
-logging.basicConfig(filename=log_filename,
-                    level=logging.DEBUG,
-                    format='%(asctime)s.%(msecs)03d %(levelname)s:  %(message)s',
-                    datefmt='%Y/%m/%d %H:%M:%S')
-rotating_handler = logging.handlers.RotatingFileHandler(log_filename, 
-                                                        maxBytes=10485760,
-                                                        backupCount=5)
 es = Elasticsearch(max_retries=5, retry_on_timeout=True)
 
 kibana_version = "4.1.4"
@@ -34,44 +26,22 @@ search_type = "search"
 kibana_index = ".kibana"
 indent_level = 3
 
-def create_document(es_index, es_type, es_id, es_body):
-    return json.dumps(es.create(index=es_index,
-                                doc_type=es_type,
-                                id=es_id,
-                                body=es_body,
-                                request_timeout=es_request_timeout),
-                      indent=indent_level)
 
 def create_document_from_file(es_index, es_type, es_id, path_to_updated_json):
-    content = read_json_from_file(path_to_updated_json)
-    create_document(es_index, es_type, es_id, content)
+    content = util.read_json_from_file(path_to_updated_json)
+    util.create_document(es_index, es_type, es_id, content)
 
 def get_es_id(filename):
     return splitext(filename)[0]
 
-def delete_document(es_index, es_type, es_id):
-    es.delete(es_index, es_type, es_id, request_timeout=es_request_timeout)
-
-def read_json_from_file(file):
-    with open(file) as file_raw:    
-        return json.load(file_raw)
-
-def safe_list_read(l, idx):
-    try:
-        value = l[idx]
-        return value
-    except:
-        logging.warning("No element in list for index: " + idx)
-        return "" 
-
 def get_version_of_file(file):
-    file_json = read_json_from_file(file)
-    version_from_file = safe_list_read(file_json, 'version')
+    file_json = util.read_json_from_file(file)
+    version_from_file = util.safe_list_read(file_json, 'version')
     return version_from_file
 
 def update_existing_document(es_index, es_type, es_id, path_to_updated_json):
-    delete_document(es_index, es_type, es_id)
-    create_document_from_file(es_index, es_type, es_id, path_to_updated_json)
+    util.delete_document(es_index, es_type, es_id)
+    util.create_document_from_file(es_index, es_type, es_id, path_to_updated_json)
 
 def get_request_as_json(es_index, es_type, es_id):
     return json.loads(json.dumps(es.get(index=es_index, doc_type=es_type, id=es_id, request_timeout=es_request_timeout)))
@@ -82,11 +52,11 @@ def load_assets(es_index, es_type, path_to_files, files):
         logging.debug("--------- " + file + " ---------")
         full_file_path = path_to_files + "/" + file
         es_id = get_es_id(file)
-        if es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=es_request_timeout):
+        if util.document_exists(es_index, es_type, es_id):
             get_response_json = get_request_as_json(es_index, es_type, es_id)
             version_of_disk_file = get_version_of_file(full_file_path)
-            es_file_source = safe_list_read(get_response_json, '_source')
-            version_of_es_file = safe_list_read(es_file_source, 'version')
+            es_file_source = util.safe_list_read(get_response_json, '_source')
+            version_of_es_file = util.safe_list_read(es_file_source, 'version')
             if version_of_disk_file > version_of_es_file:
                 logging.info("File \"" + str(file) + "\" is outdated and requires update from version " + str(version_of_es_file) +
                              " to version " + str(version_of_disk_file) + ". Updating it now...")
