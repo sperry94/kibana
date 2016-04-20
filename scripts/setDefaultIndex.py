@@ -30,12 +30,12 @@ version_config_content = {
 }
 
 def all_keys_verified(dict):
-  logging.info("  Verifying keys...")
+  #logging.info("  Verifying keys...")
   all_verified = True
   for key in dict:
-    logging.info("  Verifying key: " + key + "   --> " + str(dict[key]))
+    #logging.info("  Verifying key: " + key + "   --> " + str(dict[key]))
     all_verified = all_verified and dict[key]
-  logging.info("  all_verified is ...." + str(all_verified))
+  #logging.info("  all_verified is ...." + str(all_verified))
   return all_verified
 
 
@@ -102,7 +102,7 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
 
 # ----------------- MAIN -----------------
 def main():
-    logging.debug("================================== INDEX PATTERN ==================================")
+    logging.info("================================== INDEX PATTERN ==================================")
     index_pattern_doc_created = create_document_if_it_doesnt_exist(kibana_index,
                                                                    index_pattern_type,
                                                                    nm_index_pattern,
@@ -126,7 +126,7 @@ def main():
     else:
         logging.info("No missing index-pattern fields.")
 
-    logging.debug("================================== " + kibana_version + " CONFIG ==================================")
+    logging.info("================================== " + kibana_version + " CONFIG ==================================")
     config_doc_created = create_document_if_it_doesnt_exist(kibana_index,
                                                             config_type,
                                                             kibana_version,

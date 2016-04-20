@@ -63,7 +63,7 @@ def es_version_is_outdated(es_index, es_type, es_id, full_file_path):
 
 def load_assets(es_index, es_type, path_to_files, files):
     for file in files:
-        logging.debug("--------- " + file + " ---------")
+        logging.info("--------- " + file + " ---------")
         full_file_path = path_to_files + "/" + file
         es_id = get_es_id(file)
         ignored, asset_exists = util.function_with_timeout(10,
@@ -97,11 +97,11 @@ def main():
     searches = [file for file in listdir(searches_path) if isfile(join(searches_path, file))]
 
     # Load all the artifacts appropriately
-    logging.debug("================================== DASHBOARDS ==================================")
+    logging.info("================================== DASHBOARDS ==================================")
     load_assets(kibana_index, dashboard_type, dashboards_path, dashboards)
-    logging.debug("================================== VISUALIZATIONS ==================================")
+    logging.info("================================== VISUALIZATIONS ==================================")
     load_assets(kibana_index, visualization_type, visualizations_path, visualizations)
-    logging.debug("================================== SEARCHES ==================================")
+    logging.info("================================== SEARCHES ==================================")
     load_assets(kibana_index, search_type, searches_path, searches)
 
 if __name__ == '__main__':
