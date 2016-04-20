@@ -9,7 +9,6 @@ from scripts import util
 logging, rotating_handler = util.configure_and_return_logging()
 from os import listdir
 from os.path import isfile, join, splitext
-es_request_timeout = 30
 es = Elasticsearch(max_retries=5, retry_on_timeout=True)
 
 kibana_version = "4.1.4"
@@ -29,7 +28,12 @@ indent_level = 3
 
 def create_document_from_file(es_index, es_type, es_id, path_to_updated_json):
     content = util.read_json_from_file(path_to_updated_json)
-    util.create_document(es_index, es_type, es_id, content)
+    return util.function_with_timeout(util.STARTUP_TIMEOUT,
+                                      util.create_document,
+                                          es_index,
+                                          es_type,
+                                          es_id,
+                                          content)
 
 def get_es_id(filename):
     return splitext(filename)[0]
@@ -40,24 +44,39 @@ def get_version_of_file(file):
     return version_from_file
 
 def update_existing_document(es_index, es_type, es_id, path_to_updated_json):
-    util.delete_document(es_index, es_type, es_id)
-    util.create_document_from_file(es_index, es_type, es_id, path_to_updated_json)
+    deleted, ret_val = util.function_with_timeout(10, 
+                                                  util.delete_document,
+                                                      es_index,
+                                                      es_type,
+                                                      es_id)
+    created, ret_val = util.create_document_from_file(es_index,
+                                                      es_type,
+                                                      es_id,
+                                                      path_to_updated_json)
 
-def get_request_as_json(es_index, es_type, es_id):
-    return json.loads(json.dumps(es.get(index=es_index, doc_type=es_type, id=es_id, request_timeout=es_request_timeout)))
-
+def es_version_is_outdated(es_index, es_type, es_id, full_file_path):
+    get_response_json = util.get_request_as_json(es_index, es_type, es_id)
+    version_of_disk_file = get_version_of_file(full_file_path)
+    es_file_source = util.safe_list_read(get_response_json, '_source')
+    version_of_es_file = util.safe_list_read(es_file_source, 'version')
+    return version_of_disk_file > version_of_es_file, version_of_disk_file, version_of_es_file
 
 def load_assets(es_index, es_type, path_to_files, files):
     for file in files:
         logging.debug("--------- " + file + " ---------")
         full_file_path = path_to_files + "/" + file
         es_id = get_es_id(file)
-        if util.document_exists(es_index, es_type, es_id):
-            get_response_json = get_request_as_json(es_index, es_type, es_id)
-            version_of_disk_file = get_version_of_file(full_file_path)
-            es_file_source = util.safe_list_read(get_response_json, '_source')
-            version_of_es_file = util.safe_list_read(es_file_source, 'version')
-            if version_of_disk_file > version_of_es_file:
+        ignored, asset_exists = util.function_with_timeout(10,
+                                      util.document_exists,
+                                          es_index,
+                                          es_type,
+                                          es_id)
+        if asset_exists:
+            es_outdated, version_of_disk_file, version_of_es_file = es_version_is_outdated(es_index,
+                                                                                           es_type,
+                                                                                           es_id,
+                                                                                           full_file_path)
+            if es_outdated:
                 logging.info("File \"" + str(file) + "\" is outdated and requires update from version " + str(version_of_es_file) +
                              " to version " + str(version_of_disk_file) + ". Updating it now...")
                 update_existing_document(es_index, es_type, es_id, full_file_path)
@@ -65,7 +84,8 @@ def load_assets(es_index, es_type, path_to_files, files):
                 logging.info("Current version of file \"" + str(file) + "\" in Elasticsearch is up-to-date. Version: " + str(version_of_es_file))
         else:
             logging.info("File \"" + str(file) + "\" doesn't exist in Elasticsearch. Creating it now...")
-            create_document_from_file(es_index, es_type, es_id, full_file_path)
+            created, created_ret = create_document_from_file(es_index, es_type, es_id, full_file_path)
+            logging.info("Create returns: " + created_ret)
 
 
 # ----------------- MAIN -----------------

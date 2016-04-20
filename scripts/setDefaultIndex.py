@@ -73,14 +73,18 @@ def verify_document_for_content(es_index, es_type, content):
                 hits = util.search_index_and_type(es_index, es_type, query)
                 if hits > 0:    
                     to_verify[key] = VERIFIED
-                    logging.debug(str(hits) + " hit(s) for " + str(query) + ".")
+                    logging.info(str(hits) + " hit(s) for " + str(query) + ".")
         time.sleep(0.2) # 200ms
     return add_missing_elements_to_dict(to_verify, content_json)
 
 
 def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
     document_created = False
-    doc_existence = util.document_exists(es_index, es_type, es_id)
+    ignored, doc_existence = util.function_with_timeout(10,
+                                                        util.document_exists,
+                                                            es_index,
+                                                            es_type,
+                                                            es_id)
     if not doc_existence:
         logging.info('Document %s/%s/%s/%s does not exist. Creating it now...', LOCALHOST, es_index, es_type, es_id)
         document_created, created_ret = util.function_with_timeout(util.STARTUP_TIMEOUT,
@@ -110,10 +114,15 @@ def main():
         logging.info("Updating Network Monitor index-pattern with missing fields: ")
         for key in index_pattern_missing_fields:
             logging.info("      " + key + ":    " + config_missing_fields[key])
-        util.update_document(kibana_index,
-                        index_pattern_type,
-                        nm_index_pattern,
-                        util.format_for_update(index_pattern_missing_fields))
+        updated, update_ret = util.function_with_timeout(10,
+                                                         util.update_document,
+                                                            kibana_index,
+                                                            index_pattern_type,
+                                                            nm_index_pattern,
+                                                            util.format_for_update(index_pattern_missing_fields))
+        if not updated:
+            logging.error("Unable to add missing index-pattern fields:")
+            logging.error(update_ret)
     else:
         logging.info("No missing index-pattern fields.")
 
@@ -129,10 +138,15 @@ def main():
         logging.info("Updating " + kibana_version + " config with missing fields:   ")
         for key in config_missing_fields:
             logging.info("      " + key + ":    " + config_missing_fields[key])
-        util.update_document(kibana_index,
-                        index_pattern_type,
-                        nm_index_pattern,
-                        util.format_for_update(config_missing_fields))
+        updated, update_ret = util.function_with_timeout(10,
+                                                         util.update_document,
+                                                            kibana_index,
+                                                            index_pattern_type,
+                                                            nm_index_pattern,
+                                                            util.format_for_update(config_missing_fields))
+        if not updated:
+            logging.error("Unable to add missing index-pattern fields:")
+            logging.error(update_ret)
     else:
         logging.info("No missing " + kibana_version + " config fields.")
 
