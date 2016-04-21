@@ -53,6 +53,7 @@ def add_missing_elements_to_dict(to_verify, original_content):
 
 
 def verify_document_for_content(es_index, es_type, content):
+    logging.info("Verifying content exists in Elasticsearch correctly. This could take several Elasticsearch requests.")
     start_time = time.time()
     content_json = json.loads(json.dumps(content))
     to_verify = util.copy_dict_keys(content_json)
