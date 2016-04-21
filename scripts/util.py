@@ -11,7 +11,15 @@ DEFAULT_LOG_ROTATE_COUNT=5
 # Elasticsearch global params
 INDENT_LEVEL = 3
 ES_REQUEST_TIMEOUT = 20
+ES_QUERY_TIMEOUT = 20
 STARTUP_TIMEOUT = 300 # 5 minutes
+LOCALHOST="localhost:9200"
+KIBANA_INDEX = ".kibana"
+INDEX_PATTERN_TYPE = "index-pattern"
+CONFIG_TYPE = "config"
+KIBANA_VERSION = "4.1.4"
+
+
 import json
 import time
 import elasticsearch
@@ -65,9 +73,6 @@ def safe_list_read(l, idx):
         return "" 
 
 def time_has_run_out(start, curr, max):
-  #logging.warning("START TIME = " + str(start))
-  #logging.warning("CURR TIME = " + str(curr))
-  #logging.warning(str(curr) + " - " + str(start) + " > " + str(max) + " == " + str(curr-start>max))
   return curr - start > max
 
 def format_for_update(content):
@@ -98,7 +103,6 @@ def search_index_and_type(es_index, es_type, query):
 
     
 # Elasticsearch communication functions
-
 def create_document(es_index, es_type, es_id, es_body):
     es_create_ret = json.dumps(es.create(index=es_index,
                                 doc_type=es_type,
@@ -133,21 +137,27 @@ def get_document(es_index, es_type, es_id):
   else:
     return False, es_get_raw
 
-def read_json_from_file(file):
-    with open(file) as file_raw:    
+def read_json_from_file(filename):
+    with open(filename) as file_raw:    
         return json.load(file_raw)
 
 def function_with_timeout(timeout, function, *args):
   keep_running = True
   start_time = time.time()
   itr = 1
+  func_status = False
+  func_ret = "Not yet run"
   while not time_has_run_out(start_time, time.time(), timeout) and keep_running:
     logging.info("try_with_timeout: Attempting run number " + str(itr) + " of function")
     try:
       func_status, func_ret = function(*args)
     except elasticsearch.TransportError as es1:
       logging.info("Caught elasticsearch TransportError exception: Status Code: " + str(es1.status_code) + ". Retrying...")
-      func_status = False
+      if es1.status_code == 409:
+        # 409 - DocumentAlreadyExistsException
+        func_status = True
+      else:
+        func_status = False
     except:
       logging.info("Caught generic elasticsearch exception. Retrying...")
       func_status = False
@@ -159,7 +169,7 @@ def function_with_timeout(timeout, function, *args):
 
 
 def get_request_as_json(es_index, es_type, es_id):
-  found, raw = function_with_timeout(10,
+  found, raw = function_with_timeout(ES_REQUEST_TIMEOUT,
                                      get_document,
                                          es_index,
                                          es_type,

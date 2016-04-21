@@ -11,9 +11,7 @@ from os import listdir
 from os.path import isfile, join, splitext
 es = Elasticsearch(max_retries=5, retry_on_timeout=True)
 
-kibana_version = "4.1.4"
-
-resources = "/usr/local/kibana-" + kibana_version + "-linux-x64/resources"
+resources = "/usr/local/kibana-" + util.KIBANA_VERSION + "-linux-x64/resources"
 dashboards_path = resources + "/dashboards" 
 visualizations_path = resources + "/visualizations" 
 searches_path = resources + "/searches" 
@@ -21,10 +19,6 @@ searches_path = resources + "/searches"
 dashboard_type = "dashboard"
 visualization_type = "visualization"
 search_type = "search"
-
-kibana_index = ".kibana"
-indent_level = 3
-
 
 def create_document_from_file(es_index, es_type, es_id, path_to_updated_json):
     content = util.read_json_from_file(path_to_updated_json)
@@ -44,15 +38,17 @@ def get_version_of_file(file):
     return version_from_file
 
 def update_existing_document(es_index, es_type, es_id, path_to_updated_json):
-    deleted, ret_val = util.function_with_timeout(10, 
-                                                  util.delete_document,
-                                                      es_index,
-                                                      es_type,
-                                                      es_id)
-    created, ret_val = util.create_document_from_file(es_index,
+    deleted, del_ret_val = util.function_with_timeout(util.ES_QUERY_TIMEOUT, 
+                                                      util.delete_document,
+                                                        es_index,
+                                                        es_type,
+                                                        es_id)
+    logging.info("Delete returns: " + str(json.dumps(del_ret_val)))
+    created, create_ret_val = create_document_from_file(es_index,
                                                       es_type,
                                                       es_id,
                                                       path_to_updated_json)
+    logging.info("Create returns: " + str(create_ret_val))
 
 def es_version_is_outdated(es_index, es_type, es_id, full_file_path):
     get_response_json = util.get_request_as_json(es_index, es_type, es_id)
@@ -66,7 +62,7 @@ def load_assets(es_index, es_type, path_to_files, files):
         logging.info("--------- " + file + " ---------")
         full_file_path = path_to_files + "/" + file
         es_id = get_es_id(file)
-        ignored, asset_exists = util.function_with_timeout(10,
+        ignored, asset_exists = util.function_with_timeout(util.ES_QUERY_TIMEOUT,
                                       util.document_exists,
                                           es_index,
                                           es_type,
@@ -98,11 +94,11 @@ def main():
 
     # Load all the artifacts appropriately
     logging.info("================================== DASHBOARDS ==================================")
-    load_assets(kibana_index, dashboard_type, dashboards_path, dashboards)
+    load_assets(util.KIBANA_INDEX, dashboard_type, dashboards_path, dashboards)
     logging.info("================================== VISUALIZATIONS ==================================")
-    load_assets(kibana_index, visualization_type, visualizations_path, visualizations)
+    load_assets(util.KIBANA_INDEX, visualization_type, visualizations_path, visualizations)
     logging.info("================================== SEARCHES ==================================")
-    load_assets(kibana_index, search_type, searches_path, searches)
+    load_assets(util.KIBANA_INDEX, search_type, searches_path, searches)
 
 if __name__ == '__main__':
     main()
