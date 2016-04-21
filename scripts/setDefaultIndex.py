@@ -104,7 +104,7 @@ def main():
     if len(index_pattern_missing_fields) > 0:
         logging.info("Updating Network Monitor index-pattern with missing fields: ")
         for key in index_pattern_missing_fields:
-            logging.info("      " + key + ":    " + config_missing_fields[key])
+            logging.info("      " + key + ":    " + index_pattern_missing_fields[key])
         updated, update_ret = util.function_with_timeout(util.ES_QUERY_TIMEOUT,
                                                          util.update_document,
                                                             util.KIBANA_INDEX,

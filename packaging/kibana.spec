@@ -37,6 +37,7 @@ mkdir -p %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
 cp scripts/setDefaultIndex.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
 cp scripts/loadAssets.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
 cp scripts/util.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
+cp scripts/__init__.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
 ln -sf /usr/local/%{name}-%{kibana_version}-linux-x64 %{buildroot}/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
 
 

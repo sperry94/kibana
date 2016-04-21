@@ -23,7 +23,7 @@ KIBANA_VERSION = "4.1.4"
 import json
 import time
 import elasticsearch
-es = elasticsearch.Elasticsearch(max_retries=1, retry_on_timeout=True)
+es = elasticsearch.Elasticsearch(max_retries=1, timeout=ES_REQUEST_TIMEOUT)
 
 def configure_and_return_logging(datefmt_str=None, format_str=None):
     """
@@ -82,8 +82,7 @@ def update_document(es_index, es_type, es_id, content):
     update_ret_raw = json.dumps(es.update(index=es_index,
                                           doc_type=es_type,
                                           id=es_id,
-                                          body=content,
-                                          request_timeout=ES_REQUEST_TIMEOUT))
+                                          body=content))
     # There is no true/false return value for an ES update
     return True, update_ret_raw
 
@@ -93,8 +92,7 @@ def copy_dict_keys(dict):
 def search_index_and_type(es_index, es_type, query):
     search_response_raw = json.dumps(es.search(index=es_index,
                                                doc_type=es_type,
-                                               q=query,
-                                               request_timeout=ES_REQUEST_TIMEOUT),
+                                               q=query),
                                      indent=INDENT_LEVEL)
     search_response_json = json.loads(search_response_raw)
     hits_json = safe_list_read(search_response_json, 'hits')
@@ -107,22 +105,21 @@ def create_document(es_index, es_type, es_id, es_body):
     es_create_ret = json.dumps(es.create(index=es_index,
                                 doc_type=es_type,
                                 id=es_id,
-                                body=es_body,
-                                request_timeout=ES_REQUEST_TIMEOUT),
+                                body=es_body),
                       indent=INDENT_LEVEL)
     es_create_ret_json = json.loads(es_create_ret)
     created = safe_list_read(es_create_ret_json, 'created')
     return created, es_create_ret
 
 def document_exists(es_index, es_type, es_id):
-    exists_ret = es.exists(index=es_index, doc_type=es_type, id=es_id, request_timeout=ES_REQUEST_TIMEOUT)
+    exists_ret = es.exists(index=es_index, doc_type=es_type, id=es_id)
     # es.exists returns a true or false. 
     #   Always report that the function was successful,
     #   and leave the result in the second return value
     return True, exists_ret
    
 def delete_document(es_index, es_type, es_id):
-    es_del_raw = es.delete(es_index, es_type, es_id, request_timeout=ES_REQUEST_TIMEOUT)
+    es_del_raw = es.delete(index=es_index, doc_type=es_type, id=es_id)
     es_del_json = json.loads(json.dumps(es_del_raw))
     if safe_list_read(es_del_json, 'found'):
       return True, es_del_raw
@@ -130,7 +127,7 @@ def delete_document(es_index, es_type, es_id):
       return False, es_del_raw
 
 def get_document(es_index, es_type, es_id):
-  es_get_raw = es.get(index=es_index, doc_type=es_type, id=es_id, request_timeout=ES_REQUEST_TIMEOUT)
+  es_get_raw = es.get(index=es_index, doc_type=es_type, id=es_id)
   es_get_json = json.loads(json.dumps(es_get_raw))
   if safe_list_read(es_get_json, 'found'):
     return True, es_get_raw
