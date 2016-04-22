@@ -42,12 +42,6 @@ ln -sf /usr/local/%{name}-%{kibana_version}-linux-x64 %{buildroot}/usr/local/www
 
 
 %post
-link=/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
-if [ ! -L $link ]; then
-   ln -s /usr/local/%{name}-%{kibana_version}-linux-x64 $link
-   sudo chown -R  nginx:nginx $link
-fi
-
 if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/setDefaultIndex.sh ]; then
    rm /usr/local/%{name}-%{kibana_version}-linux-x64/setDefaultIndex.sh
 fi
