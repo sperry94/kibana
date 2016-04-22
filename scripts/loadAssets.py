@@ -88,9 +88,9 @@ def load_assets(es_index, es_type, path_to_files, files):
 def main():
 
     # Create arrays of the filenames in each of the resource dirs
-    dashboards = [file for file in listdir(dashboards_path) if isfile(join(dashboards_path, file))]
-    visualizations = [file for file in listdir(visualizations_path) if isfile(join(visualizations_path, file))]
-    searches = [file for file in listdir(searches_path) if isfile(join(searches_path, file))]
+    dashboards = [filename for filename in listdir(dashboards_path) if isfile(join(dashboards_path, filename))]
+    visualizations = [filename for filename in listdir(visualizations_path) if isfile(join(visualizations_path, filename))]
+    searches = [filename for filename in listdir(searches_path) if isfile(join(searches_path, filename))]
 
     # Load all the artifacts appropriately
     logging.info("================================== DASHBOARDS ==================================")
