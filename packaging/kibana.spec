@@ -29,9 +29,9 @@ sh scripts/kibanaBuild.sh %{proto_branch} %{protobuf_user}
 cd %{name}
 #extract the built tarball to the www location
 mkdir -p %{buildroot}/usr/local/www/probe/
-mkdir -p %{buildroot}/etc/init
+mkdir -p %{buildroot}/lib/systemd/system
 tar xvf target/%{name}-%{kibana_version}-linux-x64.tar.gz -C %{buildroot}/usr/local/
-cp init/kibana.conf %{buildroot}/etc/init
+cp systemd/kibana.service %{buildroot}/lib/systemd/system
 cp -r resources/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 cp scripts/setDefaultIndex.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 cp scripts/loadAssets.sh %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
@@ -39,6 +39,7 @@ cp scripts/refreshKibanaIndex.sh %{buildroot}/usr/local/%{name}-%{kibana_version
 ln -sf /usr/local/%{name}-%{kibana_version}-linux-x64 %{buildroot}/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
 
 %post
+/usr/bin/systemctl enable kibana.service
 
 %postun
 
@@ -46,4 +47,4 @@ ln -sf /usr/local/%{name}-%{kibana_version}-linux-x64 %{buildroot}/usr/local/www
 %defattr(-,nginx,nginx,-)
 /usr/local/www/probe
 /usr/local/%{name}-%{kibana_version}-linux-x64
-%attr(0644,root,root) /etc/init/kibana.conf
+%attr(0644,root,root) /lib/systemd/system/kibana.service
