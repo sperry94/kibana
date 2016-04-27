@@ -12,8 +12,8 @@ logger = Logger()
 logging, rotating_handler = logger.configure_and_return_logging()
 UTIL = Utility()
 
-nm_index_pattern='[network_]YYYY_MM_DD'
-default_index='"defaultIndex": \"%s\"' % nm_index_pattern
+NM_INDEX_PATTERN='[network_]YYYY_MM_DD'
+default_index='"defaultIndex": \"%s\"' % NM_INDEX_PATTERN
 VERIFIED = 1
 
 index_pattern_content = {
@@ -100,7 +100,7 @@ def main():
     logging.info("================================== INDEX PATTERN ==================================")
     index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
                                                                    esUtil.INDEX_PATTERN_TYPE,
-                                                                   nm_index_pattern,
+                                                                   NM_INDEX_PATTERN,
                                                                    index_pattern_content)
     index_pattern_missing_fields = verify_document_for_content(esUtil.KIBANA_INDEX,
                                                                esUtil.INDEX_PATTERN_TYPE,
@@ -113,7 +113,7 @@ def main():
                                                          esUtil.update_document,
                                                             esUtil.KIBANA_INDEX,
                                                             esUtil.INDEX_PATTERN_TYPE,
-                                                            nm_index_pattern,
+                                                            NM_INDEX_PATTERN,
                                                             esUtil.format_for_update(index_pattern_missing_fields))
         if not updated:
             logging.error("Unable to add missing index-pattern fields:")
@@ -137,7 +137,7 @@ def main():
                                                          esUtil.update_document,
                                                             esUtil.KIBANA_INDEX,
                                                             esUtil.INDEX_PATTERN_TYPE,
-                                                            nm_index_pattern,
+                                                            NM_INDEX_PATTERN,
                                                             esUtil.format_for_update(config_missing_fields))
         if not updated:
             logging.error("Unable to add missing index-pattern fields:")

@@ -149,7 +149,7 @@ class ElasticsearchUtil:
 
 
   def get_request_as_json(self, es_index, es_type, es_id):
-    found, raw = self.function_with_timeout(ES_REQUEST_TIMEOUT,
+    found, raw = self.function_with_timeout(self.ES_REQUEST_TIMEOUT,
                                       self.get_document,
                                          es_index,
                                          es_type,
