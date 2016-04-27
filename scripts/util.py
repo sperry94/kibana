@@ -91,7 +91,7 @@ class ElasticsearchUtil:
       doc_type=es_type,
       id=es_id,
       body=es_body),
-    indent=INDENT_LEVEL)
+    indent=self.INDENT_LEVEL)
     es_create_ret_json = json.loads(es_create_ret)
     created = self.UTIL.safe_list_read(es_create_ret_json, 'created')
     return created, es_create_ret
@@ -137,8 +137,9 @@ class ElasticsearchUtil:
           func_status = True
         else:
           func_status = False
-      except:
-        self.logging.info("Caught generic elasticsearch exception. Retrying...")
+      except Exception as e:
+        self.logging.info("Caught generic elasticsearch exception.")
+        self.logging.info("e: " + str(e) + " Retrying...")
         func_status = False
       if func_status:
         keep_running = False

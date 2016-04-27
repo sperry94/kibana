@@ -4,9 +4,13 @@
 
 import time
 import json
-from scripts import util
-logging, rotating_handler = util.configure_and_return_logging()
-
+from util import ElasticsearchUtil
+from util import Utility
+from util import Logger
+esUtil = ElasticsearchUtil()
+logger = Logger()
+logging, rotating_handler = logger.configure_and_return_logging()
+UTIL = Utility()
 
 nm_index_pattern='[network_]YYYY_MM_DD'
 default_index='"defaultIndex": \"%s\"' % nm_index_pattern
@@ -46,7 +50,7 @@ def verify_document_for_content(es_index, es_type, content):
     logging.info("Verifying content exists in Elasticsearch correctly. This could take several Elasticsearch requests.")
     start_time = time.time()
     content_json = json.loads(json.dumps(content))
-    to_verify = util.copy_dict_keys(content_json)
+    to_verify = UTIL.copy_dict_keys(content_json)
     # There is approximately a one second delay between
     #   when a document is inserted and when it can be
     #   retrieved. Rather than sleeping for a set amount
@@ -57,11 +61,11 @@ def verify_document_for_content(es_index, es_type, content):
     #   If the timeout passes and no document has been
     #   retrieved, we will report that it is missing and
     #   try to reinsert it.
-    while not all_keys_verified(to_verify) and not util.time_has_run_out(start_time, time.time(), util.ES_QUERY_TIMEOUT):
+    while not all_keys_verified(to_verify) and not UTIL.time_has_run_out(start_time, time.time(), esUtil.ES_QUERY_TIMEOUT):
         for key in content_json.keys():
             if to_verify[key] != VERIFIED:
                 query = key + ':' + '"'+ content_json[key] + '"'
-                hits = util.search_index_and_type(es_index, es_type, query)
+                success, hits = esUtil.search_index_and_type(es_index, es_type, query)
                 if hits > 0:    
                     to_verify[key] = VERIFIED
                     logging.info(str(hits) + " hit(s) for " + str(query) + ".")
@@ -71,15 +75,15 @@ def verify_document_for_content(es_index, es_type, content):
 
 def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
     document_created = False
-    ignored, doc_existence = util.function_with_timeout(util.ES_QUERY_TIMEOUT,
-                                                        util.document_exists,
+    ignored, doc_existence = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
+                                                          esUtil.document_exists,
                                                             es_index,
                                                             es_type,
                                                             es_id)
     if not doc_existence:
-        logging.info('Document %s/%s/%s/%s does not exist. Creating it now...', util.LOCALHOST, es_index, es_type, es_id)
-        document_created, created_ret = util.function_with_timeout(util.STARTUP_TIMEOUT,
-                                                                   util.create_document,
+        logging.info('Document %s/%s/%s/%s does not exist. Creating it now...', esUtil.LOCALHOST, es_index, es_type, es_id)
+        document_created, created_ret = esUtil.function_with_timeout(esUtil.STARTUP_TIMEOUT,
+                                                                   esUtil.create_document,
                                                                        es_index,
                                                                        es_type,
                                                                        es_id,
@@ -87,59 +91,59 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
         logging.info("Create document returns: \n %s", created_ret)
         return document_created
     else:
-        logging.info("Document %s/%s/%s/%s already exists.", util.LOCALHOST, es_index, es_type, es_id)
+        logging.info("Document %s/%s/%s/%s already exists.", esUtil.LOCALHOST, es_index, es_type, es_id)
         return document_created
 
 
 # ----------------- MAIN -----------------
 def main():
     logging.info("================================== INDEX PATTERN ==================================")
-    index_pattern_doc_created = create_document_if_it_doesnt_exist(util.KIBANA_INDEX,
-                                                                   util.INDEX_PATTERN_TYPE,
+    index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
+                                                                   esUtil.INDEX_PATTERN_TYPE,
                                                                    nm_index_pattern,
                                                                    index_pattern_content)
-    index_pattern_missing_fields = verify_document_for_content(util.KIBANA_INDEX,
-                                                               util.INDEX_PATTERN_TYPE,
+    index_pattern_missing_fields = verify_document_for_content(esUtil.KIBANA_INDEX,
+                                                               esUtil.INDEX_PATTERN_TYPE,
                                                                index_pattern_content)
     if len(index_pattern_missing_fields) > 0:
         logging.info("Updating Network Monitor index-pattern with missing fields: ")
         for key in index_pattern_missing_fields:
             logging.info("      " + key + ":    " + index_pattern_missing_fields[key])
-        updated, update_ret = util.function_with_timeout(util.ES_QUERY_TIMEOUT,
-                                                         util.update_document,
-                                                            util.KIBANA_INDEX,
-                                                            util.INDEX_PATTERN_TYPE,
+        updated, update_ret = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
+                                                         esUtil.update_document,
+                                                            esUtil.KIBANA_INDEX,
+                                                            esUtil.INDEX_PATTERN_TYPE,
                                                             nm_index_pattern,
-                                                            util.format_for_update(index_pattern_missing_fields))
+                                                            esUtil.format_for_update(index_pattern_missing_fields))
         if not updated:
             logging.error("Unable to add missing index-pattern fields:")
             logging.error(update_ret)
     else:
         logging.info("No missing index-pattern fields.")
 
-    logging.info("================================== " + util.KIBANA_VERSION + " CONFIG ==================================")
-    config_doc_created = create_document_if_it_doesnt_exist(util.KIBANA_INDEX,
-                                                            util.CONFIG_TYPE,
-                                                            util.KIBANA_VERSION,
+    logging.info("================================== " + esUtil.KIBANA_VERSION + " CONFIG ==================================")
+    config_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
+                                                            esUtil.CONFIG_TYPE,
+                                                            esUtil.KIBANA_VERSION,
                                                             version_config_content)
-    config_missing_fields = verify_document_for_content(util.KIBANA_INDEX,
-                                                        util.CONFIG_TYPE,
+    config_missing_fields = verify_document_for_content(esUtil.KIBANA_INDEX,
+                                                        esUtil.CONFIG_TYPE,
                                                         version_config_content)
     if len(config_missing_fields) > 0:
-        logging.info("Updating " + util.KIBANA_VERSION + " config with missing fields:   ")
+        logging.info("Updating " + esUtil.KIBANA_VERSION + " config with missing fields:   ")
         for key in config_missing_fields:
             logging.info("      " + key + ":    " + config_missing_fields[key])
-        updated, update_ret = util.function_with_timeout(util.ES_QUERY_TIMEOUT,
-                                                         util.update_document,
-                                                            util.KIBANA_INDEX,
-                                                            util.INDEX_PATTERN_TYPE,
+        updated, update_ret = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
+                                                         esUtil.update_document,
+                                                            esUtil.KIBANA_INDEX,
+                                                            esUtil.INDEX_PATTERN_TYPE,
                                                             nm_index_pattern,
-                                                            util.format_for_update(config_missing_fields))
+                                                            esUtil.format_for_update(config_missing_fields))
         if not updated:
             logging.error("Unable to add missing index-pattern fields:")
             logging.error(update_ret)
     else:
-        logging.info("No missing " + util.KIBANA_VERSION + " config fields.")
+        logging.info("No missing " + esUtil.KIBANA_VERSION + " config fields.")
 
 
 if __name__ == '__main__':
