@@ -15,7 +15,6 @@ logging, rotating_handler = logger.configure_and_return_logging()
 UTIL = Utility(log_file=EXPORT_LOG)
 
 OUTPUT_DIR = os.path.dirname(os.path.realpath(__file__)) 
-OUTPUT_FILE = "export.json"
 
 INDEX = esUtil.KIBANA_INDEX
 TYPE = None
@@ -60,11 +59,10 @@ def get_filename(asset_title):
 
 def get_full_path(asset_id):
    global OUTPUT_DIR
-   return OUTPUT_DIR + "/" + get_filename(asset_id)
-
-def print_to_file(content, filename=OUTPUT_FILE):
-   with open(filename, 'w') as outputfile:
-      json.dump(content, outputfile, indent=esUtil.INDENT_LEVEL)
+   if OUTPUT_DIR[-1:] == '/':
+      return OUTPUT_DIR + get_filename(asset_id)
+   else:
+      return OUTPUT_DIR + "/" + get_filename(asset_id)
 
 def strip_metadata(json_string):
    ob = json.loads(json.dumps(json_string))
@@ -83,7 +81,7 @@ def get_dashboard_panels(panels_str):
 def export_all_files(asset_dict=TO_FILE):
    global OUTPUT_DIR
    for asset_name, asset_content in asset_dict.iteritems():
-      print_to_file(asset_content, asset_name)
+      UTIL.print_to_file(asset_content, asset_name)
 
 def get_all_dashboard_content_from_ES(dashboard_raw):
    global TO_FILE

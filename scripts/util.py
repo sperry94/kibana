@@ -157,6 +157,7 @@ class ElasticsearchUtil:
 
 class Utility:
 
+  OUTPUT_FILE = "export.json"
   INDENT_LEVEL = 3
   MAIN_LOG_PATH_DEFAULT='/var/log/probe/KibanaStartup.log'
   LOGGER = None
@@ -182,7 +183,6 @@ class Utility:
       value = list_ob[key]
       return value
     except:
-      print "CAUGHT exception fuck! : " + key
       self.logging.warning("No element in list for index: " + key)
       return "" 
 
@@ -195,3 +195,7 @@ class Utility:
 
   def remove_all_char(self, string, to_remove):
     return string.replace(to_remove, "")
+
+  def print_to_file(self, content, filename=OUTPUT_FILE):
+    with open(filename, 'w') as outputfile:
+      json.dump(content, outputfile, indent=self.INDENT_LEVEL)
