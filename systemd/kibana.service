@@ -1,5 +1,7 @@
 [Unit]
 Description=Kibana 4
+Wants=elasticsearch.service
+After=elasticsearch.service
 
 [Service]
 Type=simple
@@ -28,4 +30,4 @@ ExecStartPost=/usr/bin/sh refreshKibanaIndex.sh
 Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=elasticsearch.service
