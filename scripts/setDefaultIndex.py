@@ -13,13 +13,13 @@ logging, rotating_handler = logger.configure_and_return_logging()
 UTIL = Utility()
 
 NM_INDEX_PATTERN='[network_]YYYY_MM_DD'
-default_index='"defaultIndex": \"%s\"' % NM_INDEX_PATTERN
+DEFAULT_INDEX='"defaultIndex": \"%s\"' % NM_INDEX_PATTERN
 VERIFIED = 1
 
 index_pattern_content = {
     "title": "[network_]YYYY_MM_DD",
-    "timeInverval": "days",
-    "defaultTimeField": "TimeUpdated"
+    "intervalName": "days",
+    "timeFieldName": "TimeUpdated"
 }
 
 version_config_content = {
@@ -134,11 +134,11 @@ def main():
         for key in config_missing_fields:
             logging.info("      " + key + ":    " + config_missing_fields[key])
         updated, update_ret = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
-                                                         esUtil.update_document,
-                                                            esUtil.KIBANA_INDEX,
-                                                            esUtil.INDEX_PATTERN_TYPE,
-                                                            NM_INDEX_PATTERN,
-                                                            esUtil.format_for_update(config_missing_fields))
+                                                           esUtil.update_document,
+                                                               esUtil.KIBANA_INDEX,
+                                                               esUtil.CONFIG_TYPE,
+                                                               esUtil.KIBANA_VERSION,
+                                                               esUtil.format_for_update(config_missing_fields))
         if not updated:
             logging.error("Unable to add missing index-pattern fields:")
             logging.error(update_ret)

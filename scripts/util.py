@@ -64,7 +64,7 @@ class ElasticsearchUtil:
     self.UTIL = Utility(log_file)
 
 
-  def format_for_update(self, content, thing1):
+  def format_for_update(self, content):
     return "{ \"doc\": " + str(json.dumps(content)) + " }"
 
   def update_document(self, es_index, es_type, es_id, content):
