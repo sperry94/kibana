@@ -59,7 +59,7 @@ def get_filename(asset_title):
 
 def get_full_path(asset_id):
    global OUTPUT_DIR
-   if OUTPUT_DIR[-1:] == '/':
+   if OUTPUT_DIR[-1] == '/':
       return OUTPUT_DIR + get_filename(asset_id)
    else:
       return OUTPUT_DIR + "/" + get_filename(asset_id)
