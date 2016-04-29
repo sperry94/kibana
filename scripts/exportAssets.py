@@ -24,7 +24,7 @@ DASHBOARD = "dashboard"
 VISUALIZATION = "visualization"
 SEARCH = "search"
 
-TO_FILE = {}
+FILE_PATHS_AND_CONTENTS = {}
 
 
 def get_asset(es_index, es_type, es_id):
@@ -78,13 +78,13 @@ def get_dashboard_panels(panels_str):
       panels_with_type[panel_id] = panel_type
    return panels_with_type
 
-def export_all_files(asset_dict=TO_FILE):
+def export_all_files(asset_dict=FILE_PATHS_AND_CONTENTS):
    global OUTPUT_DIR
    for asset_name, asset_content in asset_dict.iteritems():
       UTIL.print_to_file(asset_content, asset_name)
 
 def get_all_dashboard_content_from_ES(dashboard_raw):
-   global TO_FILE
+   global FILE_PATHS_AND_CONTENTS
    global INDEX
    db_json = UTIL.make_json(dashboard_raw)
    db_panels_raw = UTIL.safe_list_read(list_ob=db_json, key='panelsJSON')
@@ -92,15 +92,15 @@ def get_all_dashboard_content_from_ES(dashboard_raw):
    for panel_id, panel_type in panels_with_type.iteritems():
       success, ret = get_asset(INDEX, panel_type, panel_id)
       if success:
-         TO_FILE[get_full_path(panel_id)] = strip_metadata(ret)
+         FILE_PATHS_AND_CONTENTS[get_full_path(panel_id)] = strip_metadata(ret)
       else:
          print "ERROR: Failed to get asset " + panel_id + " needed by dashboard."
 
 def add_asset_to_output_dict(asset_raw, asset_id):
-   global TO_FILE
+   global FILE_PATHS_AND_CONTENTS
    asset_raw_no_meta = strip_metadata(json_string=asset_raw)
    full_file_path = get_full_path(asset_id=asset_id)
-   TO_FILE[full_file_path] = asset_raw_no_meta
+   FILE_PATHS_AND_CONTENTS[full_file_path] = asset_raw_no_meta
 
 
 # ----------------- MAIN -----------------
@@ -117,7 +117,7 @@ def main(argv):
    santize_input_args(arg_parser=argParser, args=args)
    
    global OUTPUT_DIR
-   global TO_FILE
+   global FILE_PATHS_AND_CONTENTS
    global TYPE
    global ID
 
@@ -140,7 +140,7 @@ def main(argv):
    if success:
       add_asset_to_output_dict(asset_raw=asset_raw, asset_id=ID)
       if TYPE == DASHBOARD:
-         get_all_dashboard_content_from_ES(dashboard_raw=UTIL.safe_list_read(list_ob=TO_FILE, key=get_full_path(asset_id=ID)))
+         get_all_dashboard_content_from_ES(dashboard_raw=UTIL.safe_list_read(list_ob=FILE_PATHS_AND_CONTENTS, key=get_full_path(asset_id=ID)))
       export_all_files()
    else:
       print "ERROR:   Did not find any " + TYPE + " named " + ID + " in Elasticsearch."
