@@ -1,7 +1,14 @@
 [Unit]
 Description=Kibana 4
+BindsTo=probemanager.service
 Wants=elasticsearch.service
 After=elasticsearch.service
+Wants=probemanager.service
+Before=probemanager.service
+Wants=probelogger.service
+Before=probelogger.service
+Wants=probetransmogrifier.service
+Before=probetransmogrifier.service
 
 [Service]
 Type=simple
