@@ -30,9 +30,8 @@ WorkingDirectory=/usr/local/kibana-4.1.4-linux-x64/
 
 ExecStart=/usr/local/kibana-4.1.4-linux-x64/node/bin/node /usr/local/kibana-4.1.4-linux-x64/src/bin/kibana.js
 
-ExecStartPost=/usr/bin/sh setDefaultIndex.sh
-ExecStartPost=/usr/bin/sh loadAssets.sh
-ExecStartPost=/usr/bin/sh refreshKibanaIndex.sh
+ExecStartPost=/usr/bin/python setDefaultIndex.py
+ExecStartPost=/usr/bin/python loadAssets.py
 
 Restart=on-failure
 
