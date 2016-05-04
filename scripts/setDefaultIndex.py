@@ -16,39 +16,12 @@ NM_INDEX_PATTERN='[network_]YYYY_MM_DD'
 DEFAULT_INDEX='"defaultIndex": \"%s\"' % NM_INDEX_PATTERN
 VERIFIED = 1
 
+FIELD_FORMAT_MAPPINGS_FILE = "usr/local/kibana-" + esUtil.KIBANA_VERSION + "-linux-x64/resources/mappings.json"
+
 index_pattern_content = {
     "title": "[network_]YYYY_MM_DD",
     "intervalName": "days",
-    "timeFieldName": "TimeUpdated",
-    "fieldFormatMap": {
-      "Duration": {
-        "id":"number",
-        "params": {
-            "pattern":"00:00:00"
-        }
-      },
-      "AttachSize": {
-        "id": "bytes"
-      },
-      "TotalBytesDelta": {
-        "id": "bytes"
-      },
-      "TotalBytes": {
-        "id":"bytes"
-      },
-      "SrcBytes": {
-        "id":"bytes"
-      },
-      "SrcBytesDelta": {
-        "id":"bytes"
-      },
-      "DestBytes": {
-        "id":"bytes"
-      },
-      "DestBytesDelta": {
-        "id":"bytes"
-      }
-    }
+    "timeFieldName": "TimeUpdated"
 }
 
 version_config_content = {
@@ -134,9 +107,17 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
         logging.info("Document %s/%s/%s/%s already exists.", esUtil.LOCALHOST, es_index, es_type, es_id)
         return document_created
 
+def get_field_mappings(filename):
+    global index_pattern_content
+    mappings_json = UTIL.read_json_from_file(filename)
+    index_pattern_content.update(mappings_json)
+
 
 # ----------------- MAIN -----------------
 def main():
+
+    # Add fieldFormatMap to index-pattern content
+    get_field_mappings(filename=FIELD_FORMAT_MAPPINGS_FILE)
 
     logging.info("================================== INDEX PATTERN ==================================")
     index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
