@@ -19,7 +19,36 @@ VERIFIED = 1
 index_pattern_content = {
     "title": "[network_]YYYY_MM_DD",
     "intervalName": "days",
-    "timeFieldName": "TimeUpdated"
+    "timeFieldName": "TimeUpdated",
+    "fieldFormatMap": {
+      "Duration": {
+        "id":"number",
+        "params": {
+            "pattern":"00:00:00"
+        }
+      },
+      "AttachSize": {
+        "id": "bytes"
+      },
+      "TotalBytesDelta": {
+        "id": "bytes"
+      },
+      "TotalBytes": {
+        "id":"bytes"
+      },
+      "SrcBytes": {
+        "id":"bytes"
+      },
+      "SrcBytesDelta": {
+        "id":"bytes"
+      },
+      "DestBytes": {
+        "id":"bytes"
+      },
+      "DestBytesDelta": {
+        "id":"bytes"
+      }
+    }
 }
 
 version_config_content = {
@@ -45,11 +74,22 @@ def add_missing_elements_to_dict(to_verify, original_content):
             missing_elements[key] = original_content[key]
     return missing_elements
 
+def flatten_dict(d):
+    def items():
+        for key, value in d.items():
+            if isinstance(value, dict):
+                for subkey, subvalue in flatten_dict(value).items():
+                    yield key + "." + subkey, subvalue
+            else:
+                yield key, value
+
+    return dict(items())
 
 def verify_document_for_content(es_index, es_type, content):
     logging.info("Verifying content exists in Elasticsearch correctly. This could take several Elasticsearch requests.")
     start_time = time.time()
-    content_json = json.loads(json.dumps(content))
+    flattened_content = flatten_dict(content)
+    content_json = json.loads(json.dumps(flattened_content))
     to_verify = UTIL.copy_dict_keys(content_json)
     # There is approximately a one second delay between
     #   when a document is inserted and when it can be
@@ -64,7 +104,7 @@ def verify_document_for_content(es_index, es_type, content):
     while not all_keys_verified(to_verify) and not UTIL.time_has_run_out(start_time, time.time(), esUtil.ES_QUERY_TIMEOUT):
         for key in content_json.keys():
             if to_verify[key] != VERIFIED:
-                query = key + ':' + '"'+ content_json[key] + '"'
+                query = key + ':' + '"'+ str(content_json[key]) + '"'
                 success, hits = esUtil.search_index_and_type(es_index, es_type, query)
                 if hits > 0:    
                     to_verify[key] = VERIFIED
@@ -97,6 +137,7 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
 
 # ----------------- MAIN -----------------
 def main():
+
     logging.info("================================== INDEX PATTERN ==================================")
     index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
                                                                    esUtil.INDEX_PATTERN_TYPE,
