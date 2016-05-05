@@ -16,6 +16,8 @@ NM_INDEX_PATTERN='[network_]YYYY_MM_DD'
 DEFAULT_INDEX='"defaultIndex": \"%s\"' % NM_INDEX_PATTERN
 VERIFIED = 1
 
+FIELD_FORMAT_MAPPINGS_FILE = "usr/local/kibana-" + esUtil.KIBANA_VERSION + "-linux-x64/resources/mappings.json"
+
 index_pattern_content = {
     "title": "[network_]YYYY_MM_DD",
     "intervalName": "days",
@@ -45,11 +47,47 @@ def add_missing_elements_to_dict(to_verify, original_content):
             missing_elements[key] = original_content[key]
     return missing_elements
 
+# When inserting our mappings into the index-pattern document, the json object can have as many nested
+#    objects as needed and insertion will handle it appropriately. However, when searching through the
+#    index pattern after it has been inserted into Elasticsearch (to verify that every field is actually
+#    there), the search requests cannot have a nested json object. The formatting for searching for a
+#    nested object is as follows:
+#
+#    es.search(index, type, key1.key2.keyN:"valueN")
+#
+# EXAMPLE:
+# {
+#  "key1": "value1",
+#  "key2": {
+#      "key3": "value3"
+#   }
+# }
+#
+# This example json object would get flattened and returned by this function as follows:
+#
+# {
+#   "key1": "value1",
+#   "key2.key3": "value3"
+# }
+#
+def flatten_dict(d):
+    def items():
+        for key, value in d.items():
+            if isinstance(value, dict):
+                for subkey, subvalue in flatten_dict(value).items():
+                    yield key + "." + subkey, subvalue
+            # If a top-level key is not nested, it is returned exactly
+            # as it is with no dotted notation. As seen in the above
+            # commented example with "key1"
+            else:
+                yield key, value
+    return dict(items())
 
 def verify_document_for_content(es_index, es_type, content):
     logging.info("Verifying content exists in Elasticsearch correctly. This could take several Elasticsearch requests.")
     start_time = time.time()
-    content_json = json.loads(json.dumps(content))
+    flattened_content = flatten_dict(content)
+    content_json = json.loads(json.dumps(flattened_content))
     to_verify = UTIL.copy_dict_keys(content_json)
     # There is approximately a one second delay between
     #   when a document is inserted and when it can be
@@ -64,7 +102,7 @@ def verify_document_for_content(es_index, es_type, content):
     while not all_keys_verified(to_verify) and not UTIL.time_has_run_out(start_time, time.time(), esUtil.ES_QUERY_TIMEOUT):
         for key in content_json.keys():
             if to_verify[key] != VERIFIED:
-                query = key + ':' + '"'+ content_json[key] + '"'
+                query = key + ':' + '"'+ str(content_json[key]) + '"'
                 success, hits = esUtil.search_index_and_type(es_index, es_type, query)
                 if hits > 0:    
                     to_verify[key] = VERIFIED
@@ -94,9 +132,18 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
         logging.info("Document %s/%s/%s/%s already exists.", esUtil.LOCALHOST, es_index, es_type, es_id)
         return document_created
 
+def get_field_mappings(filename):
+    global index_pattern_content
+    mappings_json = UTIL.read_json_from_file(filename)
+    index_pattern_content.update(mappings_json)
+
 
 # ----------------- MAIN -----------------
 def main():
+
+    # Add fieldFormatMap to index-pattern content
+    get_field_mappings(filename=FIELD_FORMAT_MAPPINGS_FILE)
+
     logging.info("================================== INDEX PATTERN ==================================")
     index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
                                                                    esUtil.INDEX_PATTERN_TYPE,
