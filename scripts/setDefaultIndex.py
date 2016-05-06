@@ -4,6 +4,7 @@
 
 import time
 import json
+import sys
 from util import ElasticsearchUtil
 from util import Utility
 from util import Logger
@@ -16,7 +17,7 @@ NM_INDEX_PATTERN='[network_]YYYY_MM_DD'
 DEFAULT_INDEX='"defaultIndex": \"%s\"' % NM_INDEX_PATTERN
 VERIFIED = 1
 
-FIELD_FORMAT_MAPPINGS_FILE = "usr/local/kibana-" + esUtil.KIBANA_VERSION + "-linux-x64/resources/mappings.json"
+FIELD_FORMAT_MAPPINGS_FILE = "/usr/local/kibana-" + esUtil.KIBANA_VERSION + "-linux-x64/resources/mappings.json"
 
 index_pattern_content = {
     "title": "[network_]YYYY_MM_DD",
@@ -83,11 +84,29 @@ def flatten_dict(d):
                 yield key, value
     return dict(items())
 
+def replace_all_char(str, to_replace, new_char):
+  return str.replace(to_replace, new_char)
+
 def verify_document_for_content(es_index, es_type, content):
     logging.info("Verifying content exists in Elasticsearch correctly. This could take several Elasticsearch requests.")
     start_time = time.time()
-    flattened_content = flatten_dict(content)
-    content_json = json.loads(json.dumps(flattened_content))
+    #flattened_content = flatten_dict(content)
+
+    logging.info("HERE IS THE CONTENT TO VERIFY:")
+    #logging.info(json.dumps(content))
+    logging.info(content)
+
+    
+
+    content_json = json.loads(json.dumps(content))
+    for key, value in content_json.iteritems():
+        logging.info("KEY = " + key)
+        logging.info("   VALUE = " + value)
+        #if key == "fieldFormatMap":
+            #content_json[key] = replace_all_char(str=json.dumps(value), to_replace='\"', new_char='\\"')
+            #content_json[key] = json.dumps(value)
+	    #logging.info("NEW VALUE AT " + key + "=====")
+            #logging.info(content_json[key])
     to_verify = UTIL.copy_dict_keys(content_json)
     # There is approximately a one second delay between
     #   when a document is inserted and when it can be
@@ -101,8 +120,17 @@ def verify_document_for_content(es_index, es_type, content):
     #   try to reinsert it.
     while not all_keys_verified(to_verify) and not UTIL.time_has_run_out(start_time, time.time(), esUtil.ES_QUERY_TIMEOUT):
         for key in content_json.keys():
+        #for key in content.keys():
             if to_verify[key] != VERIFIED:
-                query = key + ':' + '"'+ str(content_json[key]) + '"'
+		if key == 'fieldFormatMap':
+          	    logging.info("FIELD FORMAT MAP = ")
+                    logging.info(content_json[key])
+                    logging.info("NEW FIELD FORMAT MAP = ")
+                    logging.info(json.dumps(replace_all_char(str(content_json[key]), """\\""", """\\\\""")))
+                query = key + ':' + json.dumps(content_json[key]) 
+                logging.info("QUEREY ============================================= ")
+		logging.info(query) 
+                #query = key + ':' + '"'+ str(content[key]) + '"'
                 success, hits = esUtil.search_index_and_type(es_index, es_type, query)
                 if hits > 0:    
                     to_verify[key] = VERIFIED
@@ -135,11 +163,28 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
 def get_field_mappings(filename):
     global index_pattern_content
     mappings_json = UTIL.read_json_from_file(filename)
-    index_pattern_content.update(mappings_json)
+    logging.info("OLD STRING = ")
+    logging.info(json.dumps(mappings_json))
+    value = UTIL.safe_list_read(mappings_json, 'fieldFormatMap')
+    logging.info("VALUE = ")
+    logging.info(json.dumps(value))
+    escaped_mappings = replace_all_char(str=json.dumps(value), to_replace='"', new_char='\"')
+    logging.info("NEW STRING =")
+    logging.info(json.dumps(escaped_mappings))
+    corrected_mappings = {}
+    corrected_mappings['fieldFormatMap'] = escaped_mappings
+    index_pattern_content.update(corrected_mappings)
+    logging.info("NEW CONTENT TO UPDATE WITH:")
+    logging.info(json.dumps(index_pattern_content))
+    mappings_json = json.loads(json.dumps(index_pattern_content))
+    logging.info("HERE IS THE RESULT OF content[fieldFormatMap]")
+    logging.info(json.dumps(UTIL.safe_list_read(mappings_json, 'fieldFormatMap')))
 
 
 # ----------------- MAIN -----------------
 def main():
+
+    global index_pattern_content
 
     # Add fieldFormatMap to index-pattern content
     get_field_mappings(filename=FIELD_FORMAT_MAPPINGS_FILE)
