@@ -4,7 +4,6 @@
 
 import time
 import json
-import sys
 from util import ElasticsearchUtil
 from util import Utility
 from util import Logger
