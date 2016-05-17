@@ -7,6 +7,8 @@ Wants=probemanager.service
 Before=probemanager.service
 Wants=probelogger.service
 Before=probelogger.service
+Wants=probereader.service
+Before=probereader.service
 Wants=probetransmogrifier.service
 Before=probetransmogrifier.service
 
