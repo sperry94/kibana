@@ -30,9 +30,9 @@ sh scripts/kibanaBuild.sh %{proto_branch} %{protobuf_user}
 cd %{name}
 #extract the built tarball to the www location
 mkdir -p %{buildroot}/usr/local/www/probe/
-mkdir -p %{buildroot}/etc/init
+mkdir -p %{buildroot}/lib/systemd/system
 tar xvf target/%{name}-%{kibana_version}-linux-x64.tar.gz -C %{buildroot}/usr/local/
-cp init/kibana.conf %{buildroot}/etc/init
+cp systemd/kibana.service %{buildroot}/lib/systemd/system
 cp -r resources/ %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/
 mkdir -p %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
 cp scripts/setDefaultIndex.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/scripts
@@ -41,6 +41,9 @@ cp scripts/util.py %{buildroot}/usr/local/%{name}-%{kibana_version}-linux-x64/sc
 ln -sf /usr/local/%{name}-%{kibana_version}-linux-x64 %{buildroot}/usr/local/www/probe/%{name}-%{kibana_version}-linux-x64
 
 %post
+/usr/bin/systemctl enable kibana.service
+
+# Remove the bash scripts if they exists. These have been replaced with python scripts.
 if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/setDefaultIndex.sh ]; then
    rm /usr/local/%{name}-%{kibana_version}-linux-x64/setDefaultIndex.sh
 fi
@@ -59,4 +62,4 @@ fi
 %defattr(-,nginx,nginx,-)
 /usr/local/www/probe
 /usr/local/%{name}-%{kibana_version}-linux-x64
-%attr(0644,root,root) /etc/init/kibana.conf
+%attr(0644,root,root) /lib/systemd/system/kibana.service
