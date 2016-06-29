@@ -9,6 +9,7 @@ define(function (require) {
   require('components/visualize/visualize');
   require('components/clipboard/clipboard');
   require('components/comma_list_filter');
+  require('components/index_patterns/index_patterns');
 
   require('filters/uriescape');
 
@@ -48,9 +49,13 @@ define(function (require) {
   require('modules')
   .get('app/visualize', [
     'kibana/notify',
-    'kibana/courier'
+    'kibana/courier',
+    'kibana/index_patterns',
   ])
-  .controller('VisEditor', function ($scope, $route, timefilter, AppState, $location, kbnUrl, $timeout, courier, Private, Promise) {
+  .controller('VisEditor', function ($scope, $route, timefilter, AppState, 
+     $location, kbnUrl, $timeout, courier, Private, Promise, indexPatterns) {
+     
+    indexPatterns.refresh();
 
     var _ = require('lodash');
     var angular = require('angular');
@@ -122,7 +127,7 @@ define(function (require) {
       $scope.state = $state;
       $scope.conf = _.pick($scope, 'doSave', 'savedVis', 'shareData');
       $scope.configTemplate = configTemplate;
-
+      
       editableVis.listeners.click = vis.listeners.click = filterBarClickHandler($state);
       editableVis.listeners.brush = vis.listeners.brush = brushEvent;
 

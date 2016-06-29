@@ -10,6 +10,7 @@ define(function (require) {
   require('components/notify/notify');
   require('components/typeahead/typeahead');
   require('components/clipboard/clipboard');
+  require('components/index_patterns/index_patterns');
   require('netmon_libs/custom_modules/save_rule/modal/modal');
   require('netmon_libs/custom_modules/save_rule/services/saveRuleManager');
   require('angular-bootstrap');
@@ -35,6 +36,7 @@ define(function (require) {
     'kibana/config',
     'kibana/notify',
     'kibana/typeahead',
+    'kibana/index_patterns',
     'ui.bootstrap',
     'ui.validate',
     'elasticjs.service'
@@ -83,7 +85,9 @@ define(function (require) {
                                          datemath.parse(scope.timefilter.time.to));
               });
           },
-        controller: function ($scope, $route, $routeParams, $location, $http, configFile, Private, getAppState, saveRuleManager) {
+        controller: function ($scope, $route, $routeParams, $location, $http, 
+           configFile, Private, getAppState, saveRuleManager, indexPatterns) {
+        indexPatterns.refresh();
         $scope.saveRuleManager = saveRuleManager;
         var queryFilter = Private(require('components/filter_bar/query_filter'));
 
@@ -223,7 +227,7 @@ define(function (require) {
           pendingVis++;
           $state.panels.push({ id: hit.id, type: 'search' });
         };
-
+        
         // Setup configurable values for config directive, after objects are initialized
         $scope.opts = {
           dashboard: dash,

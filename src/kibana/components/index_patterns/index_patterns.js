@@ -11,6 +11,7 @@ define(function (require) {
     var patternCache = Private(require('components/index_patterns/_pattern_cache'));
 
     var notify = new Notifier({ location: 'IndexPatterns Service'});
+    var DEFAULT_INDEX_PATTERN = '[network_]YYYY_MM_DD';
 
     self.get = function (id) {
       if (!id) return self.make();
@@ -22,6 +23,12 @@ define(function (require) {
     self.make = function (id) {
       return (new IndexPattern(id)).init();
     };
+    
+    self.refresh = function() {
+      return self.get(DEFAULT_INDEX_PATTERN).then(function(indexPattern){
+         indexPattern.refreshFields();
+      });
+   };
 
     self.delete = function (pattern) {
       self.getIds.clearCache();
