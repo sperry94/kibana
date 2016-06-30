@@ -19,6 +19,8 @@ define(function (require) {
   require('components/state_management/app_state');
   require('components/timefilter/timefilter');
   require('components/highlight/highlight_tags');
+  require('components/index_patterns/index_patterns');
+
 
   var app = require('modules').get('apps/discover', [
     'kibana/notify',
@@ -62,7 +64,9 @@ define(function (require) {
   });
 
   app.controller('discover', function ($scope, config, courier, $route, $window, Notifier,
-    AppState, timefilter, Promise, Private, kbnUrl, highlightTags) {
+    AppState, timefilter, Promise, Private, kbnUrl, highlightTags, indexPatterns) {
+      
+    indexPatterns.refresh();
 
     var Vis = Private(require('components/vis/vis'));
     var docTitle = Private(require('components/doc_title/doc_title'));
