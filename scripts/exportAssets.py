@@ -48,11 +48,11 @@ def print_error_and_usage(argParser, error):
 
 def santize_input_args(arg_parser, args):
    if len(sys.argv) == 1:
-      print_error_and_usage(argParser, "No arguments supplied.")
+      print_error_and_usage(arg_parser, "No arguments supplied.")
    if (args.dash_name is None
       and args.viz_name is None
       and args.search_name is None):
-      print_error_and_usage(argParser, "Must have one of the following flags: -d -v -s")
+      print_error_and_usage(arg_parser, "Must have one of the following flags: -d -v -s")
 
 def get_filename(asset_title):
    return asset_title + ".json"
