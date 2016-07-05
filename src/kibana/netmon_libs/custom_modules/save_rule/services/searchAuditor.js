@@ -1,7 +1,6 @@
 define(function (require) {
     var app = require('modules').get('app/dashboard');
     var _ = require('lodash');
-    var datemath = require('utils/datemath');
     var moment = require('moment');
     var angular = require('angular');
 
@@ -9,6 +8,7 @@ define(function (require) {
     app.factory('searchAuditor', function (elasticSearchFields, 
       Restangular, timefilter) {
          var FORMAT_STRING = 'YYYY/MM/DD HH:mm:ss';
+         var INDEX_PATTERN = '[network_]YYYY_MM_DD';
 
          var previousQuery = {
              query    : '',
@@ -34,8 +34,9 @@ define(function (require) {
         var logQuery = function(query) {
             // ignore these searches for search auditing
             
-            var timeFrom = datemath.parse(timefilter.time.from);
-            var timeTo = datemath.parse(timefilter.time.to);
+            var timeRange = timefilter.getBounds();
+            var timeFrom = timeRange.min;
+            var timeTo = timeRange.max;
                             
             if (!timeFrom || !timeTo || 
                 query === '' || 
