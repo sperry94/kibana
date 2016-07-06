@@ -73,14 +73,20 @@ define(function (require) {
         };
         
         return {
-            logAndCapitalize : function(stateObj) {
-                var capitalizedQuery = formatQuery(stateObj.query.query_string.query)[0];
+            logAndCapitalize : function(query) {
+                var capitalizedQuery = formatQuery(query.query_string.query)[0];
                 logQuery(capitalizedQuery);
-                // seems like we need a deep copy to force angular to reflect the
+                // seems like we need to create a new object to force angular to reflect the
                 // query change in the view
-                var newState = angular.copy(stateObj);
-                newState.query.query_string.query = capitalizedQuery;
-                return newState;
+                
+                var newQuery =
+                  {
+                    query_string : {
+                       query : capitalizedQuery,
+                       analyze_wildcard : query.query_string.analyze_wildcard
+                  }
+                };
+                return newQuery;
             }
 
         };

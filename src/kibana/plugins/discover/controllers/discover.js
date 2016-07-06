@@ -292,7 +292,7 @@ define(function (require) {
       // ignore requests to fetch before the app inits
       if (!init.complete) return;
       
-      $scope.state = searchAuditor.logAndCapitalize($scope.state);
+      $scope.state.query = searchAuditor.logAndCapitalize($scope.state.query);
       
       $scope.updateTime();
 

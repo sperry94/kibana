@@ -164,8 +164,8 @@ define(function (require) {
 
             $scope.filterResults = function () {
               
-            
-              $scope.state = searchAuditor.logAndCapitalize($scope.state);
+          
+              $scope.state.query = searchAuditor.logAndCapitalize($scope.state.query);
               
               updateQueryOnRootSource();
               $state.save();

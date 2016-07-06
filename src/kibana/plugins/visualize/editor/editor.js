@@ -215,7 +215,7 @@ define(function (require) {
     }
 
     $scope.fetch = function () {
-      $scope.state = searchAuditor.logAndCapitalize($scope.state);
+      $scope.state.query = searchAuditor.logAndCapitalize($scope.state.query);
       $state.save();
       searchSource.set('filter', queryFilter.getFilters());
       if (!$state.linked) searchSource.set('query', $state.query);
