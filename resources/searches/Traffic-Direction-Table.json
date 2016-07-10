@@ -12,9 +12,10 @@
    }, 
    "columns": [
       "TrafficDirection_NM", 
+      "Application", 
       "DestIP", 
       "SrcIP", 
-      "TotalBytesDelta", 
+      "TotalBytes", 
       "Session"
    ]
 }
