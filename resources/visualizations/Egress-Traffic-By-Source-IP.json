@@ -3,7 +3,7 @@
    "kibanaSavedObjectMeta": {
       "searchSourceJSON": "{\"index\":\"[network_]YYYY_MM_DD\",\"query\":{\"query_string\":{\"query\":\"TrafficDirection_NM:egress\",\"analyze_wildcard\":true}},\"filter\":[]}"
    }, 
-   "version": 1, 
+   "version": 2, 
    "description": "", 
    "title": "Egress Traffic By Source IP"
 }

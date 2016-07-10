@@ -3,7 +3,7 @@
    "kibanaSavedObjectMeta": {
       "searchSourceJSON": "{\"index\":\"[network_]YYYY_MM_DD\",\"query\":{\"query_string\":{\"query\":\"TrafficDirection_NM:ingress\",\"analyze_wildcard\":true}},\"filter\":[]}"
    }, 
-   "version": 1, 
+   "version": 2, 
    "description": "", 
    "title": "Ingress Traffic By Application"
 }

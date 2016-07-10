@@ -3,7 +3,7 @@
    "kibanaSavedObjectMeta": {
       "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
    }, 
-   "version": 1, 
+   "version": 2, 
    "description": "", 
    "title": "Ingress Egress Traffic Dashboard Description"
 }
