@@ -15,7 +15,6 @@
       "DestIP", 
       "Application", 
       "Duration", 
-      "Session", 
       "Domain_TLD_NM", 
       "Domain_SLD_NM", 
       "Domain_FQDN_NM"
