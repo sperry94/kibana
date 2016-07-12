@@ -1,9 +1,9 @@
 {
-   "visState": "{\"type\":\"markdown\",\"params\":{\"markdown\":\"### Data will only be visible in this dashboard if you enable the IdentifyIngressEgressLateralTraffic system rule.    \\n* **Egress** traffic has a source IP in the internal network and a destination IP outside of your network.   \\n* **Ingress** traffic has a source IP that is outside your internal network and a destination IP that is inside your network.  \\n* **Lateral** traffic has  source and destination IPs inside your network.  \\n* **Other** trafic has no IP addresses or has IPV6 addresses.\\n\\nYour internal network is defined by the IP ranges in the  IdentifyIngressEgressLateralTraffic system rule.\"},\"aggs\":[],\"listeners\":{}}", 
+   "visState": "{\"type\":\"markdown\",\"params\":{\"markdown\":\"### Data will only be visible in this dashboard if you enable the Flow_IdentifyTrafficDirection system rule.    \\n* **Egress** traffic has a source IP that is inside your network and a destination IP that is outside your network.   \\n* **Ingress** traffic has a source IP that is outside your network and a destination IP that is inside your network.  \\n* **Lateral** traffic has source and destination IPs inside your network.  \\n* **Other** traffic has no IP addresses or has IPV6 addresses.\\n\\nYour internal network is defined by the IP ranges in the  Flow_IdentifyTrafficDirection system rule.\"},\"aggs\":[],\"listeners\":{}}", 
    "kibanaSavedObjectMeta": {
       "searchSourceJSON": "{\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
    }, 
-   "version": 1, 
+   "version": 2, 
    "description": "", 
    "title": "Ingress Egress Traffic Dashboard Description"
 }
