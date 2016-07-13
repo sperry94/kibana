@@ -10,6 +10,8 @@ define(function (require) {
   require('components/clipboard/clipboard');
   require('components/comma_list_filter');
   require('components/index_patterns/index_patterns');
+  
+  require('netmon_libs/custom_modules/save_rule/services/searchAuditor');
 
   require('filters/uriescape');
 
@@ -53,7 +55,7 @@ define(function (require) {
     'kibana/index_patterns',
   ])
   .controller('VisEditor', function ($scope, $route, timefilter, AppState, 
-     $location, kbnUrl, $timeout, courier, Private, Promise, indexPatterns) {
+     $location, kbnUrl, $timeout, courier, Private, Promise, indexPatterns, searchAuditor) {
      
     indexPatterns.refresh();
 
@@ -213,6 +215,7 @@ define(function (require) {
     }
 
     $scope.fetch = function () {
+      $scope.state.query = searchAuditor.logAndCapitalize($scope.state.query);
       $state.save();
       searchSource.set('filter', queryFilter.getFilters());
       if (!$state.linked) searchSource.set('query', $state.query);

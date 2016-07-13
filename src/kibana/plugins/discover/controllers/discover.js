@@ -20,6 +20,8 @@ define(function (require) {
   require('components/timefilter/timefilter');
   require('components/highlight/highlight_tags');
   require('components/index_patterns/index_patterns');
+  
+  require('netmon_libs/custom_modules/save_rule/services/searchAuditor');
 
 
   var app = require('modules').get('apps/discover', [
@@ -64,7 +66,7 @@ define(function (require) {
   });
 
   app.controller('discover', function ($scope, config, courier, $route, $window, Notifier,
-    AppState, timefilter, Promise, Private, kbnUrl, highlightTags, indexPatterns) {
+    AppState, timefilter, Promise, Private, kbnUrl, highlightTags, indexPatterns, searchAuditor) {
       
     indexPatterns.refresh();
 
@@ -289,7 +291,9 @@ define(function (require) {
     $scope.opts.fetch = $scope.fetch = function () {
       // ignore requests to fetch before the app inits
       if (!init.complete) return;
-
+      
+      $scope.state.query = searchAuditor.logAndCapitalize($scope.state.query);
+      
       $scope.updateTime();
 
       $scope.updateDataSource()
