@@ -114,7 +114,7 @@ def get_field_mappings(filename):
     #   for proper Elasticsearch insertion
     escaped_mappings = replace_all_char(str=json.dumps(value), to_replace='"', new_char='\"')
     corrected_mappings['fieldFormatMap'] = escaped_mappings
-    index_pattern_content.update(corrected_mappings)
+    network_index_pattern_content.update(corrected_mappings)
 
 # ----------------- MAIN -----------------
 def main():
