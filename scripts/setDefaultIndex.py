@@ -13,13 +13,20 @@ logging, rotating_handler = logger.configure_and_return_logging()
 UTIL = Utility()
 
 NM_INDEX_PATTERN='[network_]YYYY_MM_DD'
+EVENTS_INDEX_PATTERN='[events_]YYYY_MM_DD'
 DEFAULT_INDEX='"defaultIndex": \"%s\"' % NM_INDEX_PATTERN
 VERIFIED = 1
 
 FIELD_FORMAT_MAPPINGS_FILE = "/usr/local/kibana-" + esUtil.KIBANA_VERSION + "-linux-x64/resources/mappings.json"
 
-index_pattern_content = {
+network_index_pattern_content = {
     "title": "[network_]YYYY_MM_DD",
+    "intervalName": "days",
+    "timeFieldName": "TimeUpdated"
+}
+
+events_index_pattern_content = {
+    "title": "[events_]YYYY_MM_DD",
     "intervalName": "days",
     "timeFieldName": "TimeUpdated"
 }
@@ -99,7 +106,7 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
         return document_created
 
 def get_field_mappings(filename):
-    global index_pattern_content
+    global network_index_pattern_content
     corrected_mappings = {}
     mappings_json = UTIL.read_json_from_file(filename)
     value = UTIL.safe_list_read(mappings_json, 'fieldFormatMap')
@@ -107,39 +114,65 @@ def get_field_mappings(filename):
     #   for proper Elasticsearch insertion
     escaped_mappings = replace_all_char(str=json.dumps(value), to_replace='"', new_char='\"')
     corrected_mappings['fieldFormatMap'] = escaped_mappings
-    index_pattern_content.update(corrected_mappings)
+    network_index_pattern_content.update(corrected_mappings)
 
 # ----------------- MAIN -----------------
 def main():
 
-    global index_pattern_content
+    global network_index_pattern_content
 
     # Add fieldFormatMap to index-pattern content
     get_field_mappings(filename=FIELD_FORMAT_MAPPINGS_FILE)
 
-    logging.info("================================== INDEX PATTERN ==================================")
-    index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
+    logging.info("================================== METADATA INDEX PATTERN ==================================")
+    network_index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
                                                                    esUtil.INDEX_PATTERN_TYPE,
                                                                    NM_INDEX_PATTERN,
-                                                                   index_pattern_content)
-    index_pattern_missing_fields = verify_document_for_content(esUtil.KIBANA_INDEX,
+                                                                   network_index_pattern_content)
+    network_index_pattern_missing_fields = verify_document_for_content(esUtil.KIBANA_INDEX,
                                                                esUtil.INDEX_PATTERN_TYPE,
-                                                               index_pattern_content)
-    if len(index_pattern_missing_fields) > 0:
-        logging.info("Updating Network Monitor index-pattern with missing fields: ")
-        for key in index_pattern_missing_fields:
-            logging.info("      " + key + ":    " + index_pattern_missing_fields[key])
-        updated, update_ret = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
+                                                               network_index_pattern_content)
+    if len(network_index_pattern_missing_fields) > 0:
+        logging.info("Updating Network Monitor network index-pattern with missing fields: ")
+        for key in network_index_pattern_missing_fields:
+            logging.info("      " + key + ":    " + network_index_pattern_missing_fields[key])
+        network_updated, network_update_ret = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
                                                          esUtil.update_document,
                                                             esUtil.KIBANA_INDEX,
                                                             esUtil.INDEX_PATTERN_TYPE,
                                                             NM_INDEX_PATTERN,
-                                                            esUtil.format_for_update(index_pattern_missing_fields))
-        if not updated:
-            logging.error("Unable to add missing index-pattern fields:")
-            logging.error(update_ret)
+                                                            esUtil.format_for_update(network_index_pattern_missing_fields))
+        if not network_updated:
+            logging.error("Unable to add missing network index-pattern fields:")
+            logging.error(network_update_ret)
     else:
-        logging.info("No missing index-pattern fields.")
+        logging.info("No missing network index-pattern fields.")
+
+    logging.info("================================== EVENTS INDEX PATTERN ==================================")
+
+    events_index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
+                                                                   esUtil.INDEX_PATTERN_TYPE,
+                                                                   EVENTS_INDEX_PATTERN,
+                                                                   events_index_pattern_content)
+    events_index_pattern_missing_fields = verify_document_for_content(esUtil.KIBANA_INDEX,
+                                                               esUtil.INDEX_PATTERN_TYPE,
+                                                               events_index_pattern_content)
+    if len(events_index_pattern_missing_fields) > 0:
+        logging.info("Updating Network Monitor events index-pattern with missing fields: ")
+        for key in events_index_pattern_missing_fields:
+            logging.info("      " + key + ":    " + events_index_pattern_missing_fields[key])
+        events_updated, events_update_ret = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
+                                                         esUtil.update_document,
+                                                            esUtil.KIBANA_INDEX,
+                                                            esUtil.INDEX_PATTERN_TYPE,
+                                                            EVENTS_INDEX_PATTERN,
+                                                            esUtil.format_for_update(events_index_pattern_missing_fields))
+        if not events_updated:
+            logging.error("Unable to add missing events index-pattern fields:")
+            logging.error(events_update_ret)
+    else:
+        logging.info("No missing events index-pattern fields.")
+
 
     logging.info("================================== " + esUtil.KIBANA_VERSION + " CONFIG ==================================")
     config_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
