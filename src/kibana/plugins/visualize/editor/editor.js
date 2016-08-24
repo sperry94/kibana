@@ -57,7 +57,8 @@ define(function (require) {
   .controller('VisEditor', function ($scope, $route, timefilter, AppState, 
      $location, kbnUrl, $timeout, courier, Private, Promise, indexPatterns, searchAuditor) {
      
-    indexPatterns.refresh();
+    indexPatterns.refreshNetworkIndex();
+    indexPatterns.refreshEventsIndex();
 
     var _ = require('lodash');
     var angular = require('angular');
