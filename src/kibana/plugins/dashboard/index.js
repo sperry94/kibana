@@ -73,7 +73,8 @@ define(function (require) {
         return {
           controller: function ($scope, $route, $routeParams, $location, $http, 
              configFile, Private, getAppState, saveRuleManager, indexPatterns) {
-            indexPatterns.refresh();
+            indexPatterns.refreshNetworkIndex();
+            indexPatterns.refreshEventsIndex();
             $scope.saveRuleManager = saveRuleManager;
             var queryFilter = Private(require('components/filter_bar/query_filter'));
 

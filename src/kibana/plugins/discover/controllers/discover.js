@@ -68,7 +68,8 @@ define(function (require) {
   app.controller('discover', function ($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, highlightTags, indexPatterns, searchAuditor) {
       
-    indexPatterns.refresh();
+    indexPatterns.refreshNetworkIndex();
+    indexPatterns.refreshEventsIndex();
 
     var Vis = Private(require('components/vis/vis'));
     var docTitle = Private(require('components/doc_title/doc_title'));

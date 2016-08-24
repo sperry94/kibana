@@ -12,6 +12,7 @@ define(function (require) {
 
     var notify = new Notifier({ location: 'IndexPatterns Service'});
     var DEFAULT_INDEX_PATTERN = '[network_]YYYY_MM_DD';
+    var EVENTS_INDEX_PATTERN = '[events_]YYYY_MM_DD';
 
     self.get = function (id) {
       if (!id) return self.make();
@@ -24,11 +25,17 @@ define(function (require) {
       return (new IndexPattern(id)).init();
     };
     
-    self.refresh = function() {
+    self.refreshNetworkIndex = function() {
       return self.get(DEFAULT_INDEX_PATTERN).then(function(indexPattern){
          indexPattern.refreshFields();
       });
-   };
+    };
+
+    self.refreshEventsIndex = function() {
+      return self.get(EVENTS_INDEX_PATTERN).then(function(indexPattern){
+         indexPattern.refreshFields();
+      });
+    };
 
     self.delete = function (pattern) {
       self.getIds.clearCache();
