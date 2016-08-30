@@ -18,6 +18,7 @@ DEFAULT_INDEX='"defaultIndex": \"%s\"' % NM_INDEX_PATTERN
 VERIFIED = 1
 
 FIELD_FORMAT_MAPPINGS_FILE = "/usr/local/kibana-" + esUtil.KIBANA_VERSION + "-linux-x64/resources/mappings.json"
+EVENTS_FIELD_FORMAT_MAPPINGS_FILE = "/usr/local/kibana-" + esUtil.KIBANA_VERSION + "-linux-x64/resources/events_mappings.json"
 
 network_index_pattern_content = {
     "title": "[network_]YYYY_MM_DD",
@@ -114,15 +115,20 @@ def get_field_mappings(filename):
     #   for proper Elasticsearch insertion
     escaped_mappings = replace_all_char(str=json.dumps(value), to_replace='"', new_char='\"')
     corrected_mappings['fieldFormatMap'] = escaped_mappings
-    network_index_pattern_content.update(corrected_mappings)
+    return corrected_mappings
 
 # ----------------- MAIN -----------------
 def main():
 
     global network_index_pattern_content
+    global events_index_pattern_content
 
     # Add fieldFormatMap to index-pattern content
-    get_field_mappings(filename=FIELD_FORMAT_MAPPINGS_FILE)
+    default_field_format_mappings = get_field_mappings(filename=FIELD_FORMAT_MAPPINGS_FILE)
+    events_field_format_mappings = get_field_mappings(filename=EVENTS_FIELD_FORMAT_MAPPINGS_FILE)
+    network_index_pattern_content.update(default_field_format_mappings)
+    events_index_pattern_content.update(default_field_format_mappings)
+    events_index_pattern_content.update(events_field_format_mappings)
 
     logging.info("================================== METADATA INDEX PATTERN ==================================")
     network_index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
