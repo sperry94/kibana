@@ -11,7 +11,7 @@ define(function (require) {
   require('elasticsearch');
   require('angular-route');
   require('angular-bindonce');
-  
+
   require('restangular');
 
   var configFile = JSON.parse(require('text!config'));
@@ -53,40 +53,23 @@ define(function (require) {
       var searchUrl = window.location.search;
       var hrefUrl = window.location.href;
 
+      // Look for 'token=', then capture all characters
+      //    after (non-greedy) until either end of substring
+      //    or the next ampersand.
+      var jwtPattern = /jwt=(.*?)(&|$)/i;
+      var oneTrueJwt = String(hrefUrl).match(jwtPattern);
       console.log("KIBANA: Full Url = **"+ fullUrl +"**");
       console.log("KIBANA: Search Url = **"+ searchUrl +"**");
       console.log("KIBANA: Href Url = **"+ hrefUrl +"**");
-      var QueryString = function () {
-        // This function is anonymous, is executed immediately and 
-        // the return value is assigned to QueryString!
-        var query_string = {};
-        var query = window.location.search.substring(1);
-        var vars = query.split("&");
-        for (var i=0;i<vars.length;i++) {
-          var pair = vars[i].split("=");
-          // If first entry with this name
-          if (typeof query_string[pair[0]] === "undefined") {
-            query_string[pair[0]] = decodeURIComponent(pair[1]);
-          // If second entry with this name
-          } else if (typeof query_string[pair[0]] === "string") {
-            var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
-            query_string[pair[0]] = arr;
-            // If third or later entry with this name
-          } else {
-            query_string[pair[0]].push(decodeURIComponent(pair[1]));
-          }
-        } 
-        return query_string;
-      }();
-      console.log("OFFICIAL JWT: **" + QueryString.token + "**");
+      console.log("OFFICIAL JWT: **" + oneTrueJwt[1] + "**");
       RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
          // TODO: standardized error handling - right now we soft fail errors to empty data
-      
+
          // Redirect API login failure response to login page
          if (data.status !== 'success' && data.message && data.message.match(/you must be logged in/gi)) {
             location.href = '/login.php';
          }
-      
+
          return data && data.status === 'success' ? data.data : {error: true, message: data.message};
       });
    })
