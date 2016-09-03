@@ -58,6 +58,7 @@ define(function (require) {
       //    or the next ampersand.
       var jwtPattern = /jwt=(.*?)(&|$)/i;
       var oneTrueJwt = String(hrefUrl).match(jwtPattern);
+      localStorage.setItem('token', oneTrueJwt[1]);
       console.log("KIBANA: Full Url = **"+ fullUrl +"**");
       console.log("KIBANA: Search Url = **"+ searchUrl +"**");
       console.log("KIBANA: Href Url = **"+ hrefUrl +"**");
@@ -71,6 +72,14 @@ define(function (require) {
          }
 
          return data && data.status === 'success' ? data.data : {error: true, message: data.message};
+      });
+      RestangularProvider.addFullRequestInterceptor(function() {
+         const config = { headers: {} };
+         if (localStorage.getItem('token')) {
+            console.log("The token is in the chache! attaching it to the headers...........");
+            config.headers['Authorization'] = localStorage.getItem('token') || '';
+         }
+         return config;
       });
    })
     .config(['ngClipProvider', function (ngClipProvider) {
