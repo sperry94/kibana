@@ -171,6 +171,11 @@ define(function (require) {
                             } else {
                                 downloadID = res.downloadID;
                                 settings.fileUrl += downloadID;
+                                const token = localStorage.getItem('token');
+                                // If this fails, pcap download will be rejected.
+                                if (token) {
+                                  settings.fileUrl += "&token=" + token;
+                                }
                                 settings.prepareCallback(settings.fileUrl);
                                 //create a temporary iframe that is used to request the fileUrl as a GET request
                                 iframe = document.createElement('iframe');

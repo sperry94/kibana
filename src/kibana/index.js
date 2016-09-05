@@ -74,10 +74,14 @@ define(function (require) {
          return data && data.status === 'success' ? data.data : {error: true, message: data.message};
       });
       RestangularProvider.addFullRequestInterceptor(function() {
+         console.log("WE ARE IN THE FULL REQUEST INTERCEPTOR... CHECKING CACHE FOR TOKEN NOW!");
          const config = { headers: {} };
-         if (localStorage.getItem('token')) {
+         const token = localStorage.getItem('token');
+         if (token) {
             console.log("The token is in the chache! attaching it to the headers...........");
-            config.headers['Authorization'] = localStorage.getItem('token') || '';
+            console.log("The token is: **" + token + "**");
+            config.headers['Authorization'] = token;
+            console.log("The AUTH header is: **" + config.headers['Authorization'] + "**");
          }
          return config;
       });
