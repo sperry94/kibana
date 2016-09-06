@@ -49,13 +49,11 @@ define(function (require) {
          'Pragma': 'no-cache',
          'Expires': 0
       });
-      var fullUrl = window.location;
-      var searchUrl = window.location.search;
-      var hrefUrl = window.location.href;
 
       // Look for 'token=', then capture all characters
       //    after (non-greedy) until either end of substring
       //    or the next ampersand.
+      var hrefUrl = window.location.href;
       var jwtPattern = /jwt=(.*?)(&|$)/i;
       var jwt = String(hrefUrl).match(jwtPattern);
       localStorage.setItem('token', jwt[1]);
