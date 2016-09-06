@@ -1,11 +1,11 @@
 define(function (require) {
-   
+
     var _ = require('lodash');
     var app = require('modules').get('netmon/download');
     app.factory('fileDownloader', function(Restangular, $timeout) {
         return {
              deDupeFiles : function(fileList) {
-                 
+
                  var countOccurences = function(fileList) {
                     var dupes = false;
                     var itemFreq = {};
@@ -20,7 +20,7 @@ define(function (require) {
                     if (dupes) return itemFreq;
                     return false;
                  };
-                 
+
                  var generateNamesForDupes = function(fileList) {
                     var dupes = countOccurences(fileList);
                     if (dupes){
@@ -45,11 +45,11 @@ define(function (require) {
                     }
                     return fileList;
                  };
-                 
+
                  return generateNamesForDupes(fileList);
              },
-             
-          
+
+
             formatFileNameForModal : function(fileName) {
                var lengthToTruncate = 35;
                if (fileName.length > lengthToTruncate){
@@ -58,15 +58,15 @@ define(function (require) {
               return fileName;
             },
             get: function(settings, type, sessionID){
-               
-    			 
+
+
                 var self = this;
                 var iframe = null;
 				var downloadID = null;
 				self.route = type + '/';
 				self.type = type;
 				self.postData = {file  : settings.fileList};
-				
+
 				settings.checkInterval = 500;
 				settings.fileUrl = '/data/api/' + self.route + '?action=download&downloadID=';
 
@@ -74,7 +74,7 @@ define(function (require) {
 				if (sessionID) {
 					self.postData.sessionID = sessionID;
 				}
-    				
+
                 var cancelDownload = function(downloadID) {
                     Restangular
                         .one(self.route)
@@ -83,12 +83,12 @@ define(function (require) {
 
                     settings.failCallback(
                         {
-                            header: 'Canceled', 
+                            header: 'Canceled',
                             body: 'Download canceled.',
                             class: 'modal-header alert alert-warning'
                         }, 'Canceled');
                 };
-                
+
 
                 var getiframeDocument = function(iframe) {
                     var iframeDoc = iframe.contentWindow || iframe.contentDocument;
@@ -127,7 +127,7 @@ define(function (require) {
                                         header: 'Failure',
                                         body: 'Download interrupted.',
                                         class: 'modal-header alert alert-danger'
-                                    },  'failure');  
+                                    },  'failure');
 
                             }
                             statusList = JSON.parse(statusList);
@@ -141,8 +141,8 @@ define(function (require) {
                                             header: 'Failure',
                                             body: 'One or more of the downloads failed.',
                                             class: 'modal-header alert alert-danger'
-                                        },  bulkStatus.bulkStatus);  
-                                } 
+                                        },  bulkStatus.bulkStatus);
+                                }
                                 iframe.contentWindow.stop();
                                 iframe.parentNode.removeChild(iframe);
                             } else {
@@ -167,10 +167,15 @@ define(function (require) {
                                             header: 'Failure',
                                             body: res.data.message,
                                             class: 'alert alert-danger'
-                                        },  'Error'); 
+                                        },  'Error');
                             } else {
                                 downloadID = res.downloadID;
                                 settings.fileUrl += downloadID;
+                                const jwt = localStorage.getItem('token');
+                                // If this fails, pcap download will be rejected.
+                                if (jwt) {
+                                  settings.fileUrl += "&jwt=" + jwt;
+                                }
                                 settings.prepareCallback(settings.fileUrl);
                                 //create a temporary iframe that is used to request the fileUrl as a GET request
                                 iframe = document.createElement('iframe');

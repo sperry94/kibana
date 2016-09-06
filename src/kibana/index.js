@@ -11,7 +11,7 @@ define(function (require) {
   require('elasticsearch');
   require('angular-route');
   require('angular-bindonce');
-  
+
   require('restangular');
 
   var configFile = JSON.parse(require('text!config'));
@@ -49,15 +49,31 @@ define(function (require) {
          'Pragma': 'no-cache',
          'Expires': 0
       });
+
+      // Look for 'token=', then capture all characters
+      //    after (non-greedy) until either end of substring
+      //    or the next ampersand.
+      var hrefUrl = window.location.href;
+      var jwtPattern = /jwt=(.*?)(&|$)/i;
+      var jwt = String(hrefUrl).match(jwtPattern);
+      localStorage.setItem('token', jwt[1]);
       RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
          // TODO: standardized error handling - right now we soft fail errors to empty data
-      
+
          // Redirect API login failure response to login page
          if (data.status !== 'success' && data.message && data.message.match(/you must be logged in/gi)) {
             location.href = '/login.php';
          }
-      
+
          return data && data.status === 'success' ? data.data : {error: true, message: data.message};
+      });
+      RestangularProvider.addFullRequestInterceptor(function() {
+         const config = { headers: {} };
+         const token = localStorage.getItem('token');
+         if (token) {
+            config.headers['Authorization'] = token;
+         }
+         return config;
       });
    })
     .config(['ngClipProvider', function (ngClipProvider) {
