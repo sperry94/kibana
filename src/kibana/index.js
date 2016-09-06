@@ -57,12 +57,8 @@ define(function (require) {
       //    after (non-greedy) until either end of substring
       //    or the next ampersand.
       var jwtPattern = /jwt=(.*?)(&|$)/i;
-      var oneTrueJwt = String(hrefUrl).match(jwtPattern);
-      localStorage.setItem('token', oneTrueJwt[1]);
-      console.log("KIBANA: Full Url = **"+ fullUrl +"**");
-      console.log("KIBANA: Search Url = **"+ searchUrl +"**");
-      console.log("KIBANA: Href Url = **"+ hrefUrl +"**");
-      console.log("OFFICIAL JWT: **" + oneTrueJwt[1] + "**");
+      var jwt = String(hrefUrl).match(jwtPattern);
+      localStorage.setItem('token', jwt[1]);
       RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
          // TODO: standardized error handling - right now we soft fail errors to empty data
 
@@ -74,14 +70,10 @@ define(function (require) {
          return data && data.status === 'success' ? data.data : {error: true, message: data.message};
       });
       RestangularProvider.addFullRequestInterceptor(function() {
-         console.log("WE ARE IN THE FULL REQUEST INTERCEPTOR... CHECKING CACHE FOR TOKEN NOW!");
          const config = { headers: {} };
          const token = localStorage.getItem('token');
          if (token) {
-            console.log("The token is in the chache! attaching it to the headers...........");
-            console.log("The token is: **" + token + "**");
             config.headers['Authorization'] = token;
-            console.log("The AUTH header is: **" + config.headers['Authorization'] + "**");
          }
          return config;
       });
