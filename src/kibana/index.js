@@ -68,7 +68,6 @@ define(function (require) {
       RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
          if (data && data.status === 'success') {
             if (data.token) {
-              console.log('received new token - timeout should be updated');
                localStorage.setItem('token', data.token);
             }
             return data.data;
