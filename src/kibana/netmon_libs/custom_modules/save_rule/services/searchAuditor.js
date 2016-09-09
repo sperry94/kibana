@@ -38,9 +38,7 @@ define(function (require) {
             var timeFrom = timeRange.min;
             var timeTo = timeRange.max;
                             
-            if (!timeFrom || !timeTo || 
-                query === '' || 
-                query === '*') {
+            if (!timeFrom || !timeTo) {
                 return;
             }
             

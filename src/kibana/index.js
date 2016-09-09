@@ -57,16 +57,6 @@ define(function (require) {
       var jwtPattern = /jwt=(.*?)(&|$)/i;
       var jwt = String(hrefUrl).match(jwtPattern);
       localStorage.setItem('token', jwt[1]);
-      RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
-         // TODO: standardized error handling - right now we soft fail errors to empty data
-
-         // Redirect API login failure response to login page
-         if (data.status !== 'success' && data.message && data.message.match(/you must be logged in/gi)) {
-            location.href = '/login.php';
-         }
-
-         return data && data.status === 'success' ? data.data : {error: true, message: data.message};
-      });
       RestangularProvider.addFullRequestInterceptor(function() {
          const config = { headers: {} };
          const token = localStorage.getItem('token');
@@ -74,6 +64,22 @@ define(function (require) {
             config.headers['Authorization'] = token;
          }
          return config;
+      });
+      RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
+         if (data && data.status === 'success') {
+            if (data.token) {
+              console.log('received new token - timeout should be updated');
+               localStorage.setItem('token', data.token);
+            }
+            return data.data;
+         } else {
+            return { error: true, message: data.message };
+         }
+      });
+      RestangularProvider.setErrorInterceptor(function(response, deferred, responseHandler) {
+         if (response.status === 401) {
+            location.href = '/login';
+         }
       });
    })
     .config(['ngClipProvider', function (ngClipProvider) {
