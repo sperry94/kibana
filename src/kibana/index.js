@@ -56,7 +56,9 @@ define(function (require) {
       var hrefUrl = window.location.href;
       var jwtPattern = /jwt=(.*?)(&|$)/i;
       var jwt = String(hrefUrl).match(jwtPattern);
-      localStorage.setItem('token', jwt[1]);
+      if (jwt && jwt.length > 0) {
+        localStorage.setItem('token', jwt[1]);
+      }
       RestangularProvider.addFullRequestInterceptor(function() {
          const config = { headers: {} };
          const token = localStorage.getItem('token');
