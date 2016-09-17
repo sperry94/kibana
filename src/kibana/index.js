@@ -63,7 +63,7 @@ define(function (require) {
          const config = { headers: {} };
          const token = localStorage.getItem('token');
          if (token) {
-            config.headers['Authorization'] = token;
+            config.headers['Token'] = token;
          }
          return config;
       });
