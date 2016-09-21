@@ -23,7 +23,7 @@ echo "USER IS $USER";
 
 echo "Building: $BRANCH for USER: $USER"
 
-git clone git@lrgit:$USER/Protobuffers.git -b $BRANCH
+git clone git@github.schq.secious.com:$USER/Protobuffers.git -b $BRANCH
 
 kibanaBuildDir=$PWD
 
