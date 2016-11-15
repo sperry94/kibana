@@ -7,7 +7,7 @@
       </div>
       <div class="modal-body" ng-if="!!savableRule.loading">
          <div class="loading">
-            <img src="/analyze/common/img/load-white.gif" />
+            <img ng-src="{{loadingIconPath}}" />
          </div>
       </div>
       <div class="modal-body" ng-if="!savableRule.loading">
@@ -27,7 +27,7 @@
       </div>
       <div class="modal-body" ng-if="!!savableRule.loading">
          <div class="loading">
-            <img src="/analyze/common/img/load-white.gif" />
+            <img ng-src="{{loadingIconPath}}" />
          </div>
       </div>
       <div class="modal-body" ng-if="!savableRule.loading">
@@ -45,7 +45,7 @@
       </div>
       <div class="modal-body" ng-if="!!savableRule.loading">
          <div class="loading">
-            <img src="/analyze/common/img/load-white.gif" />
+            <img ng-src="{{loadingIconPath}}" />
          </div>
       </div>
       <div class="modal-body" ng-if="!savableRule.loading">
@@ -63,41 +63,41 @@
       </div>
       <div class="modal-body" ng-if="!!savableRule.loading">
          <div class="loading">
-            <img src="/analyze/common/img/load-white.gif" />
+            <img ng-src="{{loadingIconPath}}" />
          </div>
       </div>
       <div class="modal-body" ng-if="!savableRule.loading">
          <form name="$parent.saveRuleForm" class="form-horizontal LR-rule-modal">
             <input type="hidden" name="enabled" ng-model="savableRule.enabled" />
             <div class="form-group">
-               <label 
-                  for="inputName" 
+               <label
+                  for="inputName"
                   ng-class="{ error : validators.hasErrors(saveRuleForm.name) }">
                   Name
                </label>
-               <input 
-                  type="text" 
-                  name="name" 
-                  id="inputName" 
+               <input
+                  type="text"
+                  name="name"
+                  id="inputName"
                   class="form-control"
-                  ng-model="savableRule.name" 
-                  ui-validate="{ required : 'validators.required($value)', basicCharacters : 'validators.basicCharacters($value)', uniqueRule : 'validators.uniqueRule($value, savableRule.id)' }" 
+                  ng-model="savableRule.name"
+                  ui-validate="{ required : 'validators.required($value)', basicCharacters : 'validators.basicCharacters($value)', uniqueRule : 'validators.uniqueRule($value, savableRule.id)' }"
                 />
                <div class="formValidatorError"  ng-show="validators.showError(saveRuleForm.name, 'required')">Name is required.</div>
                <div class="formValidatorError" ng-show="validators.showError(saveRuleForm.name, 'basicCharacters')">Only alphanumeric characters, spaces, dashes, or underscores are allowed.</div>
                <div class="formValidatorError" ng-show="validators.showError(saveRuleForm.name, 'uniqueRule')">There is already a saved rule with this name.</div>
             </div>
             <div class="form-group">
-               <label 
-                  for="severitySelect" 
+               <label
+                  for="severitySelect"
                   ng-class="{ error : validators.hasErrors(saveRuleForm.severity) }">
                   Severity
                </label>
-               <select 
+               <select
                   id="severitySelect"
-                  name="severity" 
+                  name="severity"
                   class="form-control"
-                  ng-model="savableRule.severity" 
+                  ng-model="savableRule.severity"
                   ui-validate="{ required : 'validators.required($value)' }">
                   <option value="">Choose Severity...</option>
                   <option value="low">Low</option>
@@ -107,8 +107,8 @@
                <div class="formValidatorError" ng-show="validators.showError(saveRuleForm.severity, 'required')">Severity is required.</div>
             </div>
             <div class="form-group">
-               <label 
-                  for="search-box" 
+               <label
+                  for="search-box"
                   ng-class="{ error : validators.hasErrors(saveRuleForm.query) }">
                   Search
                </label>

@@ -1,20 +1,21 @@
 define(function (require) {
-   
+
     var app = require('modules').get('app/dashboard');
     require('netmon_libs/custom_modules/save_rule/services/validators');
     require('netmon_libs/custom_modules/save_rule/services/kbnIndexService');
     require('netmon_libs/custom_modules/save_rule/services/ElasticSearchFields');
-    
+
     var moment = require('moment');
     var angular = require('angular');
     var _ = require('lodash');
-    
+
     app.controller('SaveRuleController', function ($scope, $modalInstance, $http, query, formValidators, Restangular, ejsResource, kbnIndex, elasticSearchFields) {
+        $scope.loadingIconPath = '/analyze/assets/img/load-white.gif';
         $scope.init = function(query){
            $scope.ejs = ejsResource('https://' + window.location.hostname);
            $scope.elasticSearchFields = elasticSearchFields;
            $scope.validators = formValidators;
-           
+
            $scope.savableRule = {
               state: 'unsaved'
            };
@@ -24,9 +25,9 @@ define(function (require) {
               $scope.savableRule.query = query.query_string.query;
            }
         };
-        
+
         $scope.init(query);
-        
+
          $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
          };
