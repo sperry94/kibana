@@ -43,7 +43,6 @@ define(function (require) {
     // attach the route manager's known routes
     .config(routes.config)
     .config(function(RestangularProvider) {
-      RestangularProvider.setBaseUrl('/data/api');
       RestangularProvider.setDefaultHeaders({
          'Cache-Control': 'no-cache, no-store, must-revalidate',
          'Pragma': 'no-cache',
@@ -68,7 +67,8 @@ define(function (require) {
          return config;
       });
       RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
-         if (data && data.status === 'success') {
+         RestangularProvider.setBaseUrl('/data/api');
+         if ((data && data.status === 'success') || (response.status === 200)){
             if (response.headers('Token')) {
                localStorage.setItem('token', response.headers('Token'));
             }

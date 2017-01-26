@@ -3,16 +3,16 @@
 *  between Kibana and NetMon
 */
 define(function (require) {
-   
+
   var app = require('modules').get('app/dashboard');
-  
+
   app.factory('formValidators', function ($q, $timeout, $http, ejsResource, Restangular) {
      var timeouts = {};
      return {
         hasErrors: function(formCtrl) {
             return !formCtrl.$pristine && !formCtrl.$valid;
          },
-         showError: function(formCtrl, field) {  
+         showError: function(formCtrl, field) {
             return !formCtrl.$pristine && !!formCtrl.$error[field];
          },
          required: function(value) {
@@ -32,18 +32,14 @@ define(function (require) {
                $timeout.cancel(timeouts['uniqueRule']);
             }
             timeouts['uniqueRule'] = $timeout(function() {
-               Restangular
-                  .one('rules/')
-                  .get({ name: value })
+               $http.get('/api/queryRules/' + value)
                   .then(function(rule) {
-                     if (!rule || rule.error || !rule.id) {
-                        deferred.resolve();
-                     } else {
-                        deferred.reject();
-                     }
+                     deferred.reject();
+                  }, function(error){
+                     deferred.resolve();
                   });
             }, 500);
-            
+
             return deferred.promise;
          },
          notAllQuery: function(value) {
