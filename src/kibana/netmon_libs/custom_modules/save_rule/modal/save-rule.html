@@ -1,21 +1,21 @@
-<div ng-switch="savableRule.state">
+<div ng-switch="modalState.state">
 
    <!-- Confirm save -->
    <div ng-switch-when="unconfirmed">
       <div class="modal-header">
          <h3>Create Rule</h3>
       </div>
-      <div class="modal-body" ng-if="!!savableRule.loading">
+      <div class="modal-body" ng-if="!!modalState.loading">
          <div class="loading">
             <img ng-src="{{loadingIconPath}}" />
          </div>
       </div>
-      <div class="modal-body" ng-if="!savableRule.loading">
-       <p>In the last 24 hours, this rule would have triggered <strong>{{ savableRule.numMatches | number }}</strong> time(s).</p>
-       <p>Are you sure you want to create the rule {{ savableRule.name }}?</p>
+      <div class="modal-body" ng-if="!modalState.loading">
+       <p>In the last 24 hours, this rule would have triggered <strong>{{ modalState.numMatches | number }}</strong> time(s).</p>
+       <p>Are you sure you want to create the rule {{ savableRule.id }}?</p>
       </div>
       <div class="modal-footer">
-         <button class="btn btn-primary-orig" type="button" ng-click="saveRule(savableRule)" ng-if="!savableRule.id && !savableRule.loading">Confirm</button>
+         <button class="btn btn-primary-orig" type="button" ng-click="saveRule(savableRule)" ng-if="!modalState.loading">Confirm</button>
          <button class="btn btn-default-orig" type="button" ng-click="cancel()">Cancel</button>
       </div>
    </div>
@@ -25,12 +25,12 @@
       <div class="modal-header">
          <h3>Save Complete</h3>
       </div>
-      <div class="modal-body" ng-if="!!savableRule.loading">
+      <div class="modal-body" ng-if="!!modalState.loading">
          <div class="loading">
             <img ng-src="{{loadingIconPath}}" />
          </div>
       </div>
-      <div class="modal-body" ng-if="!savableRule.loading">
+      <div class="modal-body" ng-if="!modalState.loading">
          Rule saved successfully.
       </div>
       <div class="modal-footer">
@@ -43,13 +43,13 @@
       <div class="modal-header">
          <h3>Error</h3>
       </div>
-      <div class="modal-body" ng-if="!!savableRule.loading">
+      <div class="modal-body" ng-if="!!modalState.loading">
          <div class="loading">
             <img ng-src="{{loadingIconPath}}" />
          </div>
       </div>
-      <div class="modal-body" ng-if="!savableRule.loading">
-         {{ savableRule.error }}
+      <div class="modal-body" ng-if="!modalState.loading">
+         {{ modalState.error }}
       </div>
       <div class="modal-footer">
          <button class="btn btn-default-orig" type="button" ng-click="cancel()">Close</button>
@@ -61,12 +61,12 @@
       <div class="modal-header">
          <h3>Create Rule</h3>
       </div>
-      <div class="modal-body" ng-if="!!savableRule.loading">
+      <div class="modal-body" ng-if="!!modalState.loading">
          <div class="loading">
             <img ng-src="{{loadingIconPath}}" />
          </div>
       </div>
-      <div class="modal-body" ng-if="!savableRule.loading">
+      <div class="modal-body" ng-if="!modalState.loading">
          <form name="$parent.saveRuleForm" class="form-horizontal LR-rule-modal">
             <input type="hidden" name="enabled" ng-model="savableRule.enabled" />
             <div class="form-group">
@@ -80,7 +80,7 @@
                   name="name"
                   id="inputName"
                   class="form-control"
-                  ng-model="savableRule.name"
+                  ng-model="savableRule.id"
                   ui-validate="{ required : 'validators.required($value)', basicCharacters : 'validators.basicCharacters($value)', uniqueRule : 'validators.uniqueRule($value, savableRule.id)' }"
                 />
                <div class="formValidatorError"  ng-show="validators.showError(saveRuleForm.name, 'required')">Name is required.</div>

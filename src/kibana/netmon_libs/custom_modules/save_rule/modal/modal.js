@@ -15,13 +15,14 @@ define(function (require) {
            $scope.ejs = ejsResource('https://' + window.location.hostname);
            $scope.elasticSearchFields = elasticSearchFields;
            $scope.validators = formValidators;
-
            $scope.savableRule = {
+             enabled: true
+           };
+           $scope.modalState = {
               state: 'unsaved'
            };
 
            if (query.query_string.query && query.query_string.query !== '*') {
-              $scope.savableRule.queryObj = query;
               $scope.savableRule.query = query.query_string.query;
            }
         };
@@ -36,8 +37,8 @@ define(function (require) {
             var from = moment().subtract('days', 1).toDate(),
                 to = moment().toDate();
 
-            $scope.savableRule.state = 'unconfirmed';
-            $scope.savableRule.loading = true;
+            $scope.modalState.state = 'unconfirmed';
+            $scope.modalState.loading = true;
             form.$setPristine();
 
             kbnIndex.indices(from, to, '[network_]YYYY_MM_DD', 'day')
@@ -59,60 +60,40 @@ define(function (require) {
                         .doSearch()
                         .then(
                            function(result) {
-                              $scope.savableRule.loading = false;
+                              $scope.modalState.loading = false;
 
                               if (result && result.facets && result.facets.rules && result.facets.rules.count !== undefined) {
-                                 $scope.savableRule.numMatches = result.facets.rules.count;
+                                 $scope.modalState.numMatches = result.facets.rules.count;
                               } else {
-                                 $scope.savableRule.state = 'error';
-                                 $scope.savableRule.error = 'There was a problem executing your search.';
+                                 $scope.modalState.state = 'error';
+                                 $scope.modalState.error = 'There was a problem executing your search.';
                               }
                            },
                            function() {
-                              $scope.savableRule.loading = false;
-                              $scope.savableRule.state = 'error';
-                              $scope.savableRule.error = 'There was a problem executing your search.';
+                              $scope.modalState.loading = false;
+                              $scope.modalState.state = 'error';
+                              $scope.modalState.error = 'There was a problem executing your search.';
                            }
                         );
                   },
                   function() {
-                     $scope.savableRule.loading = false;
-                     $scope.savableRule.state = 'error';
-                     $scope.savableRule.error = 'There was a problem executing your search.';
+                     $scope.modalState.loading = false;
+                     $scope.modalState.state = 'error';
+                     $scope.modalState.error = 'There was a problem executing your search.';
                   }
                );
          };
 
         $scope.saveRule = function(rule) {
-            rule.query = $scope.elasticSearchFields.convertQuery(rule.query);
-
-            var query = $scope.ejs.QueryStringQuery(rule.query);
-
-            rule.loading = true;
-           Restangular
-              .all('rules/')
-              .post({
-                 name: rule.name,
-                 enabled: true,
-                 severity: rule.severity,
-                 query: angular.fromJson(query.toString())
-              })
-              .then(
-                 function(data) {
-                   if (!data.error){
-                     $scope.savableRule = angular.copy(data);
-                     $scope.savableRule.state = 'saved';
-                     $scope.savableRule.loading = false;
-                   } else{
-                     $scope.savableRule = {
-                           loading: false,
-                           state: 'error',
-                           error: data.message
-                     };
-                   }
-                 },
-                function() {
-                   $scope.savableRule = {
+           $scope.modalState.loading = true;
+           $http.put('/api/queryRules/' + rule.id, rule)
+              .then(function(data) {
+                  $scope.savableRule = angular.copy(data);
+                  $scope.modalState.state = 'saved';
+                  $scope.modalState.loading = false;
+                },
+                function(error) {
+                   $scope.modalState = {
                       loading: false,
                       state: 'error',
                       error: 'There was a problem saving your rule.'

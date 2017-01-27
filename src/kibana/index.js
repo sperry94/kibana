@@ -68,7 +68,7 @@ define(function (require) {
          return config;
       });
       RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
-         if (data && data.status === 'success') {
+         if ((data && data.status === 'success') || (response.status === 200)){
             if (response.headers('Token')) {
                localStorage.setItem('token', response.headers('Token'));
             }
