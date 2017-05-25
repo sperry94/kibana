@@ -4,55 +4,31 @@
 */
 define(function (require) {
     var _ = require('lodash');
-    require('fieldmap');
     var app = require('modules').get('app/dashboard');
-    app.factory('elasticSearchFields', function() {
-          var DEFAULT_TYPE = 'networkData',
-              NETWORK_DATA_FIELDS = getFieldMap(),
-              FIELD_MAP = {
-                // default is the "network_*" indices
-                'networkData': NETWORK_DATA_FIELDS,
-                // alarms is the "events_*" indices
-                'alarms': _.extend({
-                   'rulename': 'RuleName',
-                   'ruleseverity': 'RuleSeverity'
-                }, NETWORK_DATA_FIELDS),
-                // rules is the "networkrules" index
-                'alarmRules': {
-                   'enabled': 'enabled',
-                   'severity': 'severity',
-                   'query': 'query',
-                   'createddate': 'createdDate',
-                   'lastmodifieddate': 'lastModifiedDate'
-                }
-              };
+    app.factory('elasticSearchFields', function($http) {
+          var fieldMap = {};
+          var FIELDMAP_ROUTE = "/api/metadata/fieldmap";
 
           var ElasticSearchFields = function() {
-             this.type = DEFAULT_TYPE;
          };
 
-          ElasticSearchFields.prototype.getType = function() {
-             return this.type;
-         };
+         ElasticSearchFields.prototype.fetchMapping = function() {
+            return $http.get(FIELDMAP_ROUTE).then(
+               function success(response) {
+                  fieldMap = response.data;
+                  return response.status;
+            }, function error(response) {
+                  return response.status;
+            });
+         }
 
-          ElasticSearchFields.prototype.setType = function(type) {
-             this.type = !!FIELD_MAP[type] ? type : DEFAULT_TYPE;
-             return this;
-         };
-
-          ElasticSearchFields.prototype.getMap = function() {
-             var type = this.getType();
-             return !!FIELD_MAP[type] ? FIELD_MAP[type] : FIELD_MAP[DEFAULT_TYPE];
-         };
 
           ElasticSearchFields.prototype.convertQuery = function(query) {
              query = typeof(query) !== 'string' ? query.toString() : query;
 
-             var type = this.getType(),
-                 fieldMap = this.getMap(type),
-                 regexField = /([\w\d]+):/ig,
-                 regexExists = /(_exists_:)\s*([\w\d]+)(?=\s|$)/ig,
-                 regexMAC = /(DestMAC:|SrcMAC:)\s*\"([0-9a-f]{2}[:-]){5}([0-9a-f]{2}\")/i;
+             var regexField = /([\w\d]+):/ig;
+             var regexExists = /(_exists_:)\s*([\w\d]+)(?=\s|$)/ig;
+             var regexMAC = /(DestMAC:|SrcMAC:)\s*\"([0-9a-f]{2}[:-]){5}([0-9a-f]{2}\")/i;
 
              function convertField(field) {
                 return fieldMap[field.toLowerCase()];
@@ -63,7 +39,7 @@ define(function (require) {
                 return (field === undefined) ? str : field + ':';
 
              });
-             
+
              query = query.replace(regexExists, function(str, p1, p2) {
                 var field = convertField(p2);
                 return field === undefined ? str : p1 + field;
@@ -73,10 +49,63 @@ define(function (require) {
                 var field = str.replace(p1, '').toLowerCase().trim();
                 return p1 + field;
              });
-             
+
              return query;
          };
 
           return new ElasticSearchFields();
        });
    });
+
+   /*
+   class ElasticSearchFields {
+   private FIELD_MAP: any;
+   private http;
+
+   constructor($state) {
+      this.http = new HTTP($state);
+      this.FIELD_MAP = {};
+   }
+
+   public fetchMapping(): Promise<boolean> {
+      return this.http.fetch(FIELDMAP_ROUTE).then(response => {
+         return response.json().then(json => {
+            if (response.status === 200) {
+               this.FIELD_MAP = json;
+            }
+            return response.status;
+         })
+      });
+   }
+
+   public convertQuery(query) {
+      query = typeof query !== "string" ? query.toString() : query;
+
+      const regexField = /([\w\d]+):/ig;
+      const regexExists = /(_exists_:)\s*([\w\d]+)(?=\s|$)/ig;
+      const regexMAC = /(DestMAC:|SrcMAC:)\s*\"([0-9a-f]{2}[:-]){5}([0-9a-f]{2}\")/i;
+
+      let convertField = (field) => {
+         return this.FIELD_MAP[field.toLowerCase()];
+      }
+
+      query = query.replace(regexField, function(str, p1, p2) {
+         const field = convertField(p1);
+         return (field === undefined) ? str : field + ':';
+
+      });
+
+      query = query.replace(regexExists, function(str, p1, p2) {
+         const field = convertField(p2);
+         return field === undefined ? str : p1 + field;
+      });
+
+      query = query.replace(regexMAC, function(str, p1, p2) {
+         const field = str.replace(p1, '').toLowerCase().trim();
+         return p1 + field;
+      });
+
+      return query;
+   }
+}
+*/
