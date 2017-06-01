@@ -56,6 +56,10 @@ if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/refreshKibanaIndex.sh ]; 
    rm /usr/local/%{name}-%{kibana_version}-linux-x64/refreshKibanaIndex.sh
 fi
 
+if [ -e /usr/local/%{name}-%{kibana_version}-linux-x64/src/public/netmon_libs/fieldMap.js]; then
+   rm /usr/local/%{name}-%{kibana_version}-linux-x64/src/public/netmon_libs/fieldMap.js
+fi 
+
 %postun
 
 %files
