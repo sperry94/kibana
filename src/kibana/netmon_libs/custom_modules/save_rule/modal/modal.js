@@ -40,48 +40,56 @@ define(function (require) {
             $scope.modalState.state = 'unconfirmed';
             $scope.modalState.loading = true;
             form.$setPristine();
-
-            kbnIndex.indices(from, to, '[network_]YYYY_MM_DD', 'day')
-               .then(
-                  function(indices) {
-                     $scope.ejs.Request()
-                        .indices(indices)
-                        .facet(
-                           $scope.ejs.QueryFacet('rules')
-                           .query(
-                              $scope.ejs.FilteredQuery(
-                                 $scope.ejs.QueryStringQuery($scope.elasticSearchFields.convertQuery(rule.query)),
-                                 $scope.ejs.RangeFilter('TimeUpdated')
-                                    .from(from)
-                                    .to(to)
+            $scope.elasticSearchFields.fetchMapping().then( function(statusCode) {
+               if (statusCode === 200) {
+                  rule.query = $scope.elasticSearchFields.convertQuery(rule.query);
+                  kbnIndex.indices(from, to, '[network_]YYYY_MM_DD', 'day')
+                     .then(
+                        function(indices) {
+                           $scope.ejs.Request()
+                              .indices(indices)
+                              .facet(
+                                 $scope.ejs.QueryFacet('rules')
+                                 .query(
+                                    $scope.ejs.FilteredQuery(
+                                       $scope.ejs.QueryStringQuery(rule.query),
+                                       $scope.ejs.RangeFilter('TimeUpdated')
+                                          .from(from)
+                                          .to(to)
+                                    )
+                                 )
                               )
-                           )
-                        )
-                        .doSearch()
-                        .then(
-                           function(result) {
-                              $scope.modalState.loading = false;
+                              .doSearch()
+                              .then(
+                                 function(result) {
+                                    $scope.modalState.loading = false;
 
-                              if (result && result.facets && result.facets.rules && result.facets.rules.count !== undefined) {
-                                 $scope.modalState.numMatches = result.facets.rules.count;
-                              } else {
-                                 $scope.modalState.state = 'error';
-                                 $scope.modalState.error = 'There was a problem executing your search.';
-                              }
-                           },
-                           function() {
-                              $scope.modalState.loading = false;
-                              $scope.modalState.state = 'error';
-                              $scope.modalState.error = 'There was a problem executing your search.';
-                           }
-                        );
-                  },
-                  function() {
-                     $scope.modalState.loading = false;
-                     $scope.modalState.state = 'error';
-                     $scope.modalState.error = 'There was a problem executing your search.';
-                  }
-               );
+                                    if (result && result.facets && result.facets.rules && result.facets.rules.count !== undefined) {
+                                       $scope.modalState.numMatches = result.facets.rules.count;
+                                    } else {
+                                       $scope.modalState.state = 'error';
+                                       $scope.modalState.error = 'There was a problem executing your search.';
+                                    }
+                                 },
+                                 function() {
+                                    $scope.modalState.loading = false;
+                                    $scope.modalState.state = 'error';
+                                    $scope.modalState.error = 'There was a problem executing your search.';
+                                 }
+                              );
+                        },
+                        function() {
+                           $scope.modalState.loading = false;
+                           $scope.modalState.state = 'error';
+                           $scope.modalState.error = 'There was a problem executing your search.';
+                        }
+                     );
+               } else {
+                  $scope.modalState.loading = false;
+                  $scope.modalState.state = 'error';
+                  $scope.modalState.error = "Unable to retrieve metadata mappings.";
+               }
+            });
          };
 
         $scope.saveRule = function(rule) {
