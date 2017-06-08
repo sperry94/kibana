@@ -5,7 +5,7 @@ define(function (require) {
     var angular = require('angular');
 
     var timefilter = require('components/timefilter/timefilter');
-    app.factory('searchAuditor', function (elasticSearchFields, 
+    app.factory('searchAuditor', function (elasticSearchFields,
       Restangular, timefilter) {
          var FORMAT_STRING = 'YYYY/MM/DD HH:mm:ss';
          var INDEX_PATTERN = '[network_]YYYY_MM_DD';
@@ -30,21 +30,21 @@ define(function (require) {
             }
             return _query;
         };
-        
+
         var logQuery = function(query) {
             // ignore these searches for search auditing
-            
+
             var timeRange = timefilter.getBounds();
             var timeFrom = timeRange.min;
             var timeTo = timeRange.max;
-                            
+
             if (!timeFrom || !timeTo) {
                 return;
             }
-            
+
             timeFrom = moment(timeFrom).format(FORMAT_STRING);
             timeTo = moment(timeTo).format(FORMAT_STRING);
-            
+
             if (query === previousQuery.query &&
                 timeFrom === previousQuery.fromDate &&
                 timeTo === previousQuery.toDate) {
@@ -69,22 +69,24 @@ define(function (require) {
                     }
                 });
         };
-        
+
         return {
             logAndCapitalize : function(query) {
-                var capitalizedQuery = formatQuery(query.query_string.query)[0];
-                logQuery(capitalizedQuery);
-                // seems like we need to create a new object to force angular to reflect the
-                // query change in the view
-                
-                var newQuery =
-                  {
-                    query_string : {
-                       query : capitalizedQuery,
-                       analyze_wildcard : query.query_string.analyze_wildcard
-                  }
-                };
-                return newQuery;
+                return elasticSearchFields.fetchMapping().then( function(hasFieldMap) {
+                    var capitalizedQuery = formatQuery(query.query_string.query)[0];
+                    logQuery(capitalizedQuery);
+                    // seems like we need to create a new object to force angular to reflect the
+                    // query change in the view
+
+                   var newQuery =
+                      {
+                        query_string : {
+                           query : capitalizedQuery,
+                           analyze_wildcard : query.query_string.analyze_wildcard
+                      }
+                   };
+                   return newQuery;
+                });
             }
 
         };

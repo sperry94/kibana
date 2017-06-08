@@ -9,21 +9,27 @@ define(function (require) {
           var fieldMap = {};
           var FIELDMAP_ROUTE = "/api/metadata/fieldmap";
 
-          var ElasticSearchFields = function() {
-         };
+          var ElasticSearchFields = {};
 
-         ElasticSearchFields.prototype.fetchMapping = function() {
-            return $http.get(FIELDMAP_ROUTE).then(
-               function success(response) {
-                  fieldMap = response.data;
-                  return response.status;
-            }, function error(response) {
-                  return response.status;
-            });
-         }
+          ElasticSearchFields.fetchMapping = function() {
+             if (ElasticSearchFields.hasFieldMap()) {
+                return Promise.resolve(true);
+             }
+             return $http.get(FIELDMAP_ROUTE).then(
+                function success(response) {
+                   fieldMap = response.data;
+                   return ElasticSearchFields.hasFieldMap();
+             }, function error(response) {
+                   console.log('Unable to fetch field mapping.');
+                   return ElasticSearchFields.hasFieldMap();
+             });
+          }
 
+          ElasticSearchFields.hasFieldMap = function() {
+             return !_.isEmpty(fieldMap);
+          }
 
-          ElasticSearchFields.prototype.convertQuery = function(query) {
+          ElasticSearchFields.convertQuery = function(query) {
              query = typeof(query) !== 'string' ? query.toString() : query;
 
              var regexField = /([\w\d]+):/ig;
@@ -51,8 +57,9 @@ define(function (require) {
              });
 
              return query;
-         };
+          };
 
-          return new ElasticSearchFields();
+          ElasticSearchFields.fetchMapping();
+          return ElasticSearchFields;
        });
    });

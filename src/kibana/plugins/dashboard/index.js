@@ -4,7 +4,7 @@ define(function (require) {
   var angular = require('angular');
   var ConfigTemplate = require('utils/config_template');
   var datemath = require('utils/datemath');
-  
+
   require('directives/config');
   require('components/courier/courier');
   require('components/config/config');
@@ -15,8 +15,8 @@ define(function (require) {
   require('netmon_libs/custom_modules/save_rule/modal/modal');
   require('netmon_libs/custom_modules/save_rule/services/saveRuleManager');
   require('angular-bootstrap');
-  
-  // NetMon Non-Kibana Libraries 
+
+  // NetMon Non-Kibana Libraries
   require('ui-util');
   require('elasticjs');
   require('elasticjs-angular');
@@ -64,14 +64,14 @@ define(function (require) {
       }
     }
   });
-    app.controller('DashboardSaveController', function($scope, $routeParams, 
+    app.controller('DashboardSaveController', function($scope, $routeParams,
         $location, ipCookie) {
         ipCookie('dashboard', $routeParams.id, {path: '/'});
     })
     .directive('dashboardApp', function (Notifier, courier, AppState,
                                             timefilter, kbnUrl, searchAuditor) {
         return {
-          controller: function ($scope, $route, $routeParams, $location, $http, 
+          controller: function ($scope, $route, $routeParams, $location, $http,
              configFile, Private, getAppState, saveRuleManager, indexPatterns) {
             indexPatterns.refreshNetworkIndex();
             indexPatterns.refreshEventsIndex();
@@ -164,13 +164,13 @@ define(function (require) {
             };
 
             $scope.filterResults = function () {
-              
-          
-              $scope.state.query = searchAuditor.logAndCapitalize($scope.state.query);
-              
-              updateQueryOnRootSource();
-              $state.save();
-              $scope.refresh();
+
+               searchAuditor.logAndCapitalize($scope.state.query).then(function(query) {
+                  $scope.state.query = query;
+                  updateQueryOnRootSource();
+                  $state.save();
+                  $scope.refresh();
+               });
             };
 
             $scope.save = function () {
@@ -218,7 +218,7 @@ define(function (require) {
               pendingVis++;
               $state.panels.push({ id: hit.id, type: 'search' });
             };
-            
+
             // Setup configurable values for config directive, after objects are initialized
             $scope.opts = {
               dashboard: dash,
@@ -239,7 +239,7 @@ define(function (require) {
           }
     };
   });
-  
+
   var apps = require('registry/apps');
   apps.register(function DashboardAppModule() {
     return {
