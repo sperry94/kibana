@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ $# -ne 1 ] ; then
     echo 'Usage:  sh buildRpm <KIBANA-OFFICIAL-BRANCH>'
-    exit 0
+    exit 1
 fi
 set -e
 set -x
