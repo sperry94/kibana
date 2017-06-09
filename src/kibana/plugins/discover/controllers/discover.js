@@ -20,7 +20,7 @@ define(function (require) {
   require('components/timefilter/timefilter');
   require('components/highlight/highlight_tags');
   require('components/index_patterns/index_patterns');
-  
+
   require('netmon_libs/custom_modules/save_rule/services/searchAuditor');
 
 
@@ -67,7 +67,7 @@ define(function (require) {
 
   app.controller('discover', function ($scope, config, courier, $route, $window, Notifier,
     AppState, timefilter, Promise, Private, kbnUrl, highlightTags, indexPatterns, searchAuditor) {
-      
+
     indexPatterns.refreshNetworkIndex();
     indexPatterns.refreshEventsIndex();
 
@@ -292,18 +292,21 @@ define(function (require) {
     $scope.opts.fetch = $scope.fetch = function () {
       // ignore requests to fetch before the app inits
       if (!init.complete) return;
-      
-      $scope.state.query = searchAuditor.logAndCapitalize($scope.state.query);
-      
-      $scope.updateTime();
 
-      $scope.updateDataSource()
-      .then(setupVisualization)
-      .then(function () {
-        $state.save();
-        return courier.fetch();
-      })
-      .catch(notify.error);
+      searchAuditor.logAndCapitalize($scope.state.query).then(function(query) {
+
+         $scope.state.query = query;
+
+         $scope.updateTime();
+
+         $scope.updateDataSource()
+         .then(setupVisualization)
+         .then(function () {
+           $state.save();
+           return courier.fetch();
+         })
+         .catch(notify.error);
+      });
     };
 
     $scope.searchSource.onBeginSegmentedFetch(function (segmented) {

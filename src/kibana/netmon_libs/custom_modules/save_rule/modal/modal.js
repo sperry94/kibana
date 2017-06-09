@@ -40,8 +40,8 @@ define(function (require) {
             $scope.modalState.state = 'unconfirmed';
             $scope.modalState.loading = true;
             form.$setPristine();
-            $scope.elasticSearchFields.fetchMapping().then( function(statusCode) {
-               if (statusCode === 200) {
+            $scope.elasticSearchFields.fetchMapping().then( function(hasFieldMap) {
+               if (hasFieldMap) {
                   rule.query = $scope.elasticSearchFields.convertQuery(rule.query);
                   kbnIndex.indices(from, to, '[network_]YYYY_MM_DD', 'day')
                      .then(

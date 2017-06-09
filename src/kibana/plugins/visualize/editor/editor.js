@@ -10,7 +10,7 @@ define(function (require) {
   require('components/clipboard/clipboard');
   require('components/comma_list_filter');
   require('components/index_patterns/index_patterns');
-  
+
   require('netmon_libs/custom_modules/save_rule/services/searchAuditor');
 
   require('filters/uriescape');
@@ -54,9 +54,9 @@ define(function (require) {
     'kibana/courier',
     'kibana/index_patterns',
   ])
-  .controller('VisEditor', function ($scope, $route, timefilter, AppState, 
+  .controller('VisEditor', function ($scope, $route, timefilter, AppState,
      $location, kbnUrl, $timeout, courier, Private, Promise, indexPatterns, searchAuditor) {
-     
+
     indexPatterns.refreshNetworkIndex();
     indexPatterns.refreshEventsIndex();
 
@@ -130,7 +130,7 @@ define(function (require) {
       $scope.state = $state;
       $scope.conf = _.pick($scope, 'doSave', 'savedVis', 'shareData');
       $scope.configTemplate = configTemplate;
-      
+
       editableVis.listeners.click = vis.listeners.click = filterBarClickHandler($state);
       editableVis.listeners.brush = vis.listeners.brush = brushEvent;
 
@@ -216,13 +216,15 @@ define(function (require) {
     }
 
     $scope.fetch = function () {
-      $scope.state.query = searchAuditor.logAndCapitalize($scope.state.query);
-      $state.save();
-      searchSource.set('filter', queryFilter.getFilters());
-      if (!$state.linked) searchSource.set('query', $state.query);
-      if ($scope.vis.type.requiresSearch) {
-        courier.fetch();
-      }
+      searchAuditor.logAndCapitalize($scope.state.query).then(function(query) {
+         $scope.state.query = query;
+         $state.save();
+         searchSource.set('filter', queryFilter.getFilters());
+         if (!$state.linked) searchSource.set('query', $state.query);
+         if ($scope.vis.type.requiresSearch) {
+           courier.fetch();
+         }
+      });
     };
 
 
