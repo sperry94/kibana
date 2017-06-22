@@ -7,6 +7,7 @@ Group:         Development/Tools
 URL:           https://github.com/joyent/%{name}
 Source:        http://nodejs.org/dist/v%{version}/%{name}-v{%version}.tar.gz
 Requires:      python-elasticsearch >= 1.0.0
+Requires(post): /usr/bin/systemctl
 
 %description
 kibana build for logrhythm
