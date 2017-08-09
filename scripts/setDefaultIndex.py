@@ -10,6 +10,8 @@ from util import Logger
 esUtil = ElasticsearchUtil()
 logger = Logger()
 logging, rotating_handler = logger.configure_and_return_logging()
+logger = logging.getLogger()
+logger.addHandler(rotating_handler)
 UTIL = Utility()
 
 NM_INDEX_PATTERN='[network_]YYYY_MM_DD'
@@ -47,7 +49,7 @@ def add_missing_elements_to_dict(to_verify, original_content):
     missing_elements = {}
     for key in to_verify:
         if to_verify[key] != VERIFIED:
-            logging.debug("No hits for \"" + 
+            logger.debug("No hits for \"" +
                           key +
                           "\":\"" +
                           original_content[key] +
@@ -59,7 +61,7 @@ def replace_all_char(str, to_replace, new_char):
   return str.replace(to_replace, new_char)
 
 def verify_document_for_content(es_index, es_type, content):
-    logging.info("Verifying content exists in Elasticsearch correctly. This could take several Elasticsearch requests.")
+    logger.info("Verifying content exists in Elasticsearch correctly. This could take several Elasticsearch requests.")
     start_time = time.time()
     content_json = json.loads(json.dumps(content))
     to_verify = UTIL.copy_dict_keys(content_json)
@@ -76,11 +78,11 @@ def verify_document_for_content(es_index, es_type, content):
     while not all_keys_verified(to_verify) and not UTIL.time_has_run_out(start_time, time.time(), esUtil.ES_QUERY_TIMEOUT):
         for key in content_json.keys():
             if to_verify[key] != VERIFIED:
-                query = key + ':' + json.dumps(content_json[key]) 
+                query = key + ':' + json.dumps(content_json[key])
                 success, hits = esUtil.search_index_and_type(es_index, es_type, query)
-                if hits > 0:    
+                if hits > 0:
                     to_verify[key] = VERIFIED
-                    logging.info(str(hits) + " hit(s) for " + str(query) + ".")
+                    logger.info(str(hits) + " hit(s) for " + str(query) + ".")
         time.sleep(0.2) # 200ms
     return add_missing_elements_to_dict(to_verify, content_json)
 
@@ -93,17 +95,17 @@ def create_document_if_it_doesnt_exist(es_index, es_type, es_id, es_body):
                                                             es_type,
                                                             es_id)
     if not doc_existence:
-        logging.info('Document %s/%s/%s/%s does not exist. Creating it now...', esUtil.LOCALHOST, es_index, es_type, es_id)
+        logger.info('Document %s/%s/%s/%s does not exist. Creating it now...', esUtil.LOCALHOST, es_index, es_type, es_id)
         document_created, created_ret = esUtil.function_with_timeout(esUtil.STARTUP_TIMEOUT,
                                                                    esUtil.create_document,
                                                                        es_index,
                                                                        es_type,
                                                                        es_id,
                                                                        es_body)
-        logging.info("Create document returns: \n %s", created_ret)
+        logger.info("Create document returns: \n %s", created_ret)
         return document_created
     else:
-        logging.info("Document %s/%s/%s/%s already exists.", esUtil.LOCALHOST, es_index, es_type, es_id)
+        logger.info("Document %s/%s/%s/%s already exists.", esUtil.LOCALHOST, es_index, es_type, es_id)
         return document_created
 
 def get_field_mappings(filename):
@@ -116,6 +118,7 @@ def get_field_mappings(filename):
     escaped_mappings = replace_all_char(str=json.dumps(value), to_replace='"', new_char='\"')
     corrected_mappings['fieldFormatMap'] = escaped_mappings
     return corrected_mappings
+
 
 # ----------------- MAIN -----------------
 def main():
@@ -130,7 +133,7 @@ def main():
     events_index_pattern_content.update(default_field_format_mappings)
     events_index_pattern_content.update(events_field_format_mappings)
 
-    logging.info("================================== METADATA INDEX PATTERN ==================================")
+    logger.info("================================== METADATA INDEX PATTERN ==================================")
     network_index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
                                                                    esUtil.INDEX_PATTERN_TYPE,
                                                                    NM_INDEX_PATTERN,
@@ -139,9 +142,9 @@ def main():
                                                                esUtil.INDEX_PATTERN_TYPE,
                                                                network_index_pattern_content)
     if len(network_index_pattern_missing_fields) > 0:
-        logging.info("Updating Network Monitor network index-pattern with missing fields: ")
+        logger.info("Updating Network Monitor network index-pattern with missing fields: ")
         for key in network_index_pattern_missing_fields:
-            logging.info("      " + key + ":    " + network_index_pattern_missing_fields[key])
+            logger.info("      " + key + ":    " + network_index_pattern_missing_fields[key])
         network_updated, network_update_ret = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
                                                          esUtil.update_document,
                                                             esUtil.KIBANA_INDEX,
@@ -149,12 +152,12 @@ def main():
                                                             NM_INDEX_PATTERN,
                                                             esUtil.format_for_update(network_index_pattern_missing_fields))
         if not network_updated:
-            logging.error("Unable to add missing network index-pattern fields:")
-            logging.error(network_update_ret)
+            logger.error("Unable to add missing network index-pattern fields:")
+            logger.error(network_update_ret)
     else:
-        logging.info("No missing network index-pattern fields.")
+        logger.info("No missing network index-pattern fields.")
 
-    logging.info("================================== EVENTS INDEX PATTERN ==================================")
+    logger.info("================================== EVENTS INDEX PATTERN ==================================")
 
     events_index_pattern_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
                                                                    esUtil.INDEX_PATTERN_TYPE,
@@ -164,9 +167,9 @@ def main():
                                                                esUtil.INDEX_PATTERN_TYPE,
                                                                events_index_pattern_content)
     if len(events_index_pattern_missing_fields) > 0:
-        logging.info("Updating Network Monitor events index-pattern with missing fields: ")
+        logger.info("Updating Network Monitor events index-pattern with missing fields: ")
         for key in events_index_pattern_missing_fields:
-            logging.info("      " + key + ":    " + events_index_pattern_missing_fields[key])
+            logger.info("      " + key + ":    " + events_index_pattern_missing_fields[key])
         events_updated, events_update_ret = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
                                                          esUtil.update_document,
                                                             esUtil.KIBANA_INDEX,
@@ -174,13 +177,13 @@ def main():
                                                             EVENTS_INDEX_PATTERN,
                                                             esUtil.format_for_update(events_index_pattern_missing_fields))
         if not events_updated:
-            logging.error("Unable to add missing events index-pattern fields:")
-            logging.error(events_update_ret)
+            logger.error("Unable to add missing events index-pattern fields:")
+            logger.error(events_update_ret)
     else:
-        logging.info("No missing events index-pattern fields.")
+        logger.info("No missing events index-pattern fields.")
 
 
-    logging.info("================================== " + esUtil.KIBANA_VERSION + " CONFIG ==================================")
+    logger.info("================================== " + esUtil.KIBANA_VERSION + " CONFIG ==================================")
     config_doc_created = create_document_if_it_doesnt_exist(esUtil.KIBANA_INDEX,
                                                             esUtil.CONFIG_TYPE,
                                                             esUtil.KIBANA_VERSION,
@@ -189,9 +192,9 @@ def main():
                                                         esUtil.CONFIG_TYPE,
                                                         version_config_content)
     if len(config_missing_fields) > 0:
-        logging.info("Updating " + esUtil.KIBANA_VERSION + " config with missing fields:   ")
+        logger.info("Updating " + esUtil.KIBANA_VERSION + " config with missing fields:   ")
         for key in config_missing_fields:
-            logging.info("      " + key + ":    " + config_missing_fields[key])
+            logger.info("      " + key + ":    " + config_missing_fields[key])
         updated, update_ret = esUtil.function_with_timeout(esUtil.ES_QUERY_TIMEOUT,
                                                            esUtil.update_document,
                                                                esUtil.KIBANA_INDEX,
@@ -199,10 +202,10 @@ def main():
                                                                esUtil.KIBANA_VERSION,
                                                                esUtil.format_for_update(config_missing_fields))
         if not updated:
-            logging.error("Unable to add missing index-pattern fields:")
-            logging.error(update_ret)
+            logger.error("Unable to add missing index-pattern fields:")
+            logger.error(update_ret)
     else:
-        logging.info("No missing " + esUtil.KIBANA_VERSION + " config fields.")
+        logger.info("No missing " + esUtil.KIBANA_VERSION + " config fields.")
 
 
 if __name__ == '__main__':
