@@ -4,7 +4,7 @@ import json
 import time
 import elasticsearch
 
-class Logger:
+class LogConfig:
   MAIN_LOG_FORMAT_STR='%(asctime)s.%(msecs)03d %(levelname)s:  %(message)s'
   MAIN_LOG_DATEFMT_STR='%Y/%m/%d %H:%M:%S'
   MAIN_LOG_PATH_DEFAULT='/var/log/probe/KibanaStartup.log'
@@ -58,7 +58,7 @@ class ElasticsearchUtil:
 
   def __init__(self, log_file=LOG_FILE):
     self.LOG_FILE = log_file
-    self.ES_LOGGER = Logger(self.LOG_FILE)
+    self.ES_LOGGER = LogConfig(self.LOG_FILE)
     self.logging, self.rotating_handler = self.ES_LOGGER.configure_and_return_logging()
     self.set_es_trace_logger()
     self.UTIL = Utility(log_file)
@@ -166,7 +166,7 @@ class Utility:
   rotating_handler = None
 
   def __init__(self, log_file=MAIN_LOG_PATH_DEFAULT):
-    self.LOGGER = Logger(log_file)
+    self.LOGGER = LogConfig(log_file)
     self.logging, self.rotating_handler = self.LOGGER.configure_and_return_logging()
 
   def make_json(self, content):

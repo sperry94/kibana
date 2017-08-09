@@ -6,10 +6,10 @@ import time
 import json
 from util import ElasticsearchUtil
 from util import Utility
-from util import Logger
+from util import LogConfig
 esUtil = ElasticsearchUtil()
-logger = Logger()
-logging, rotating_handler = logger.configure_and_return_logging()
+logConfig = LogConfig()
+logging, rotating_handler = logConfig.configure_and_return_logging()
 logger = logging.getLogger()
 logger.addHandler(rotating_handler)
 UTIL = Utility()
