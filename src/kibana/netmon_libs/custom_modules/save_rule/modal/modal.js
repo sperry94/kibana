@@ -34,7 +34,7 @@ define(function (require) {
          };
 
          $scope.openConfirmSaveRuleModal = function(rule, form) {
-            var from = moment().subtract('days', 1).toDate(),
+            var from = moment().subtract(1, 'days').toDate(),
                 to = moment().toDate();
 
             $scope.modalState.state = 'unconfirmed';

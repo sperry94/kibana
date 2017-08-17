@@ -102,7 +102,7 @@ define(function (require) {
 
             break;
           case 'absolute':
-            $scope.absolute.from = datemath.parse($scope.from || moment().subtract('minutes', 15));
+            $scope.absolute.from = datemath.parse($scope.from || moment().subtract(15, 'minutes'));
             $scope.absolute.to = datemath.parse($scope.to || moment(), true);
             break;
           }

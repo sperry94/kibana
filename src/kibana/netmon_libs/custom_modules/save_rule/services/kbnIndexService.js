@@ -63,19 +63,19 @@ define(function (require) {
              range.push(start.clone());
              switch (interval) {
                 case 'hour':
-                   start.add('hours',1);
+                   start.add(1,'hours');
                    break;
                 case 'day':
-                   start.add('days',1);
+                   start.add(1,'days');
                    break;
                 case 'week':
-                   start.add('weeks',1);
+                   start.add(1,'weeks');
                    break;
                 case 'month':
-                   start.add('months',1);
+                   start.add(1,'months');
                    break;
                 case 'year':
-                   start.add('years',1);
+                   start.add(1,'years');
                    break;
                 default:
                    break;
