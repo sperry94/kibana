@@ -6,8 +6,9 @@ define(function (require) {
    var timefilter = require('components/timefilter/timefilter');
 
    app.factory('searchAuditor', function (elasticSearchFields, Restangular, timefilter, $http) {
-      var FORMAT_STRING = 'YYYY/MM/DD HH:mm:ss';
-      var INDEX_PATTERN = '[network_]YYYY_MM_DD';
+      const SEARCH_URI = '/api/audit/search';
+      const FORMAT_STRING = 'YYYY/MM/DD HH:mm:ss';
+      const INDEX_PATTERN = '[network_]YYYY_MM_DD';
 
       var previousQuery = {
          query    : '',
@@ -54,17 +55,19 @@ define(function (require) {
             toDate   : timeTo
          };
 
-         $http.put('/api/audit/search', 
+         $http.put(SEARCH_URI, 
          { 
             query: query,
             from: timeFrom,
             to: timeTo
          })
-         .then(function (data) {}, 
-         function (error) {
-            var error = response.message || 'An unknown error occured';
-            console.log('Search Audit Error:', error);
-         });
+         .then(
+            function (data) { }, 
+            function (error) {
+               var error = response.message || 'An unknown error occured';
+               console.log('Search Audit Error:', error);
+            }
+         );
       };
 
       return {
