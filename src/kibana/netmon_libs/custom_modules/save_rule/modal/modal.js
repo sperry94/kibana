@@ -10,7 +10,7 @@ define(function (require) {
     var _ = require('lodash');
 
     app.controller('SaveRuleController', function ($scope, $modalInstance, $http, query, formValidators, Restangular, ejsResource, kbnIndex, elasticSearchFields) {
-        $scope.loadingIconPath = '/analyze/assets/img/load-white.gif';
+        $scope.loadingIconPath = '/client/assets/img/load-white.gif';
         $scope.init = function(query){
            $scope.ejs = ejsResource('https://' + window.location.hostname);
            $scope.elasticSearchFields = elasticSearchFields;
