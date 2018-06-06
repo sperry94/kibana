@@ -1,0 +1,19 @@
+{
+   "sort": [
+      "TimeUpdated", 
+      "asc"
+   ], 
+   "hits": 0, 
+   "description": "", 
+   "title": "Support Table", 
+   "version": 1, 
+   "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"index\":\"[network_]YYYY_MM_DD\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"highlight\":{\"pre_tags\":[\"@kibana-highlighted-field@\"],\"post_tags\":[\"@/kibana-highlighted-field@\"],\"fields\":{\"*\":{}},\"fragment_size\":2147483647},\"filter\":[]}"
+   }, 
+   "columns": [
+      "Application", 
+      "SrcIP", 
+      "DestIP", 
+      "Duration"
+   ]
+}
