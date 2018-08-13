@@ -8,16 +8,169 @@
     <link rel="shortcut icon" href="styles/theme/elk.ico">
     <title>Kibana 4</title>
     <link rel="stylesheet" href="styles/main.css?_b=@@buildNum">
+    <style>
+      @keyframes showdots {
+        0% {
+          opacity: 0;
+        }
+        33% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    
+      .logo,
+      .dot-a,
+      .logo-spinner {
+        height: 100%;
+        width: 100%;
+      }
+    
+      .logo-spinner {
+        position: relative;
+        animation-duration: .3s;
+        animation-name: showdots;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-in;
+      }
+    
+      @keyframes showhidedot {
+        0% {
+          opacity: 0;
+        }
+        20% {
+          opacity: 1;
+        }
+        40% {
+          opacity: 0;
+        }
+      }
+    
+      .dot-a {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+      }
+    
+      .animate .dot-a {
+        animation-duration: 1.5s;
+        animation-name: showhidedot;
+        animation-iteration-count: infinite;
+        animation-timing-function: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+      }
+    
+      .dot-a.dot1 {
+        animation-delay: 0.3s;
+      }
+    
+      .dot-a.dot2 {
+        animation-delay: 0.4s;
+      }
+    
+      .dot-a.dot3 {
+        animation-delay: 0.5s;
+      }
+    
+      .dot-a.dot4 {
+        animation-delay: 0.6s;
+      }
 
+      .dot-a.dot5 {
+        animation-delay: 0.7s;
+      }
+    
+      .dot-a.dot6 {
+        animation-delay: 0.8s;
+      }
+    
+      .dot {
+        fill: #ccc;
+      }
+    
+       .dot7 {
+        fill: #007DC3;
+      }
+    
+      .dot-a {
+        fill: #007DC3;
+      }
+    </style>
+    
   </head>
   <body kibana ng-class="'application-' + activeApp.id">
 
     <div class="col-md-offset-4 col-md-4 page-header initial-load">
       <center>
-        <img width="128" alt="Loading Kibana" src="images/initial_load.gif">
+            <div class="logo-spinner animate" style="width:100px;height:100px">
+                <svg
+                  class="logo"
+                  xmlns="http://www.w3.org/svg/2000"
+                  preserveAspectRatio="xMinYMin meet"
+                  viewBox="0 0 200 200"
+                >
+                  <circle class="dot" cx="91" cy="37" r="23" />
+                  <circle class="dot2 dot" cx="158" cy="37" r="23" />
+                  <circle class="dot3 dot" cx="158" cy="105" r="23" />
+                  <circle class="dot4 dot" cx="91" cy="173" r="23" />
+                  <circle class="dot5 dot" cx="23" cy="173" r="23" />
+                  <circle class="dot6 dot" cx="23" cy="105" r="23" />
+                  <circle class="dot7 dot" cx="91" cy="105" r="23" />
+                </svg>
+                <svg
+                  class="dot1 dot-a"
+                  xmlns="http://www.w3.org/svg/2000"
+                  preserveAspectRatio="xMinYMin meet"
+                  viewBox="0 0 200 200"
+                >
+                  <circle cx="91" cy="37" r="23" />
+                </svg>
+                <svg
+                  class="dot2 dot-a"
+                  xmlns="http://www.w3.org/svg/2000"
+                  preserveAspectRatio="xMinYMin meet"
+                  viewBox="0 0 200 200"
+                >
+                  <circle cx="158" cy="37" r="23" />
+                </svg>
+                <svg
+                  class="dot3 dot-a"
+                  xmlns="http://www.w3.org/svg/2000"
+                  preserveAspectRatio="xMinYMin meet"
+                  viewBox="0 0 200 200"
+                >
+                  <circle cx="158" cy="105" r="23" />
+                </svg>
+                <svg
+                  class="dot4 dot-a"
+                  xmlns="http://www.w3.org/svg/2000"
+                  preserveAspectRatio="xMinYMin meet"
+                  viewBox="0 0 200 200"
+                >
+                  <circle cx="91" cy="173" r="23" />
+                </svg>
+                <svg
+                  class="dot5 dot-a"
+                  xmlns="http://www.w3.org/svg/2000"
+                  preserveAspectRatio="xMinYMin meet"
+                  viewBox="0 0 200 200"
+                >
+                  <circle cx="23" cy="173" r="23" />
+                </svg>
+                <svg
+                  class="dot6 dot-a"
+                  xmlns="http://www.w3.org/svg/2000"
+                  preserveAspectRatio="xMinYMin meet"
+                  viewBox="0 0 200 200"
+                >
+                  <circle cx="23" cy="105" r="23" />
+                </svg>
+              </div>
         <h1>
-          <strong>Kibana</strong>
-          <small id="cache-message">is loading. Give me a moment here. I'm loading a whole bunch of code. Don't worry, all this good stuff will be cached up for next time!</small>
+          <strong>NetMon</strong>
+            <small id="cache-message">is loading. Your results will be available shortly!</small>
         </h1>
       </center>
     </div>
@@ -39,7 +192,7 @@
         require.config({ urlArgs: '_b=' + window.KIBANA_BUILD_NUM });
       }
 
-      require(['kibana'], function (kibana) { kibana.init(); });
+       require(['kibana'], function (kibana) { kibana.init(); });
     </script>
 
   </body>
