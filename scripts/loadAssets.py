@@ -27,6 +27,8 @@ dashboard_type = "dashboard"
 visualization_type = "visualization"
 search_type = "search"
 
+always_update_whitelist = ["Capture-Dashboard.json"]
+
 def create_document_from_file(es_index, es_type, es_id, path_to_updated_json):
     content = UTIL.read_json_from_file(path_to_updated_json)
     return esUtil.function_with_timeout(esUtil.STARTUP_TIMEOUT,
@@ -75,16 +77,20 @@ def load_assets(es_index, es_type, path_to_files, files):
                                           es_type,
                                           es_id)
         if asset_exists:
-            es_outdated, version_of_disk_file, version_of_es_file = es_version_is_outdated(es_index,
-                                                                                           es_type,
-                                                                                           es_id,
-                                                                                           full_file_path)
-            if es_outdated:
-                logger.info("File \"" + str(file) + "\" is outdated and requires update from version " + str(version_of_es_file) +
-                             " to version " + str(version_of_disk_file) + ". Updating it now...")
+            if file in always_update_whitelist:
+                logger.info("File \""+str(file)+"\" should always be updated.")
                 update_existing_document(es_index, es_type, es_id, full_file_path)
             else:
-                logger.info("Current version of file \"" + str(file) + "\" in Elasticsearch is up-to-date. Version: " + str(version_of_es_file))
+                es_outdated, version_of_disk_file, version_of_es_file = es_version_is_outdated(es_index,
+                                                                                             es_type,
+                                                                                             es_id,
+                                                                                             full_file_path)
+                if es_outdated:
+                    logger.info("File \"" + str(file) + "\" is outdated and requires update from version " + str(version_of_es_file) +
+                             " to version " + str(version_of_disk_file) + ". Updating it now...")
+                    update_existing_document(es_index, es_type, es_id, full_file_path)
+                else:
+                    logger.info("Current version of file \"" + str(file) + "\" in Elasticsearch is up-to-date. Version: " + str(version_of_es_file))
         else:
             logger.info("File \"" + str(file) + "\" doesn't exist in Elasticsearch. Creating it now...")
             created, created_ret = create_document_from_file(es_index, es_type, es_id, full_file_path)
