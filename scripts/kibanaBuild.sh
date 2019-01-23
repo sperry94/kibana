@@ -10,7 +10,6 @@ set -x
 # bower_components, node_modules etc.
 # -----------------------------------------------------
 #sed -i s/\'shasum/\'sha1sum/g tasks/create_shasums.js
-#sed -i s/0.10.x/0.10.42/g .node-version
 #NVM_DIR="$PWD/nvm" bash scripts/kibanaSpecHelper_install_nvm.sh
 #source $PWD/nvm/nvm.sh
 #nvm install "$(cat .node-version)"
