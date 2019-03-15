@@ -27,7 +27,7 @@ dashboard_type = "dashboard"
 visualization_type = "visualization"
 search_type = "search"
 
-always_update_whitelist = ["Capture-Dashboard.json"]
+always_update_whitelist = ["Capture-Dashboard.json","File-Reconstruction-Dashboard.json"]
 
 def create_document_from_file(es_index, es_type, es_id, path_to_updated_json):
     content = UTIL.read_json_from_file(path_to_updated_json)
