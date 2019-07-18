@@ -61,7 +61,10 @@ import { relativeToAbsolute } from 'ui/url/relative_to_absolute';
 import { NavControlSide } from '../';
 import { ChromeBadge, ChromeBreadcrumb, ChromeNavLink } from '../../../../../../../core/public';
 
-import Navbar from '../../../../../../../netmon/components/navigation/navbar/navbar';
+import Navbar from '@logrhythm/nm-web-shared/components/navigation/navbar/navbar';
+
+import 'tether';
+import 'bootstrap';
 
 interface Props {
   appTitle?: string;
