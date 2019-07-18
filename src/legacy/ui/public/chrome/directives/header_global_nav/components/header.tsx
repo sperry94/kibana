@@ -58,7 +58,7 @@ import { RecentlyAccessedHistoryItem } from 'ui/persisted_log';
 import { ChromeHeaderNavControlsRegistry } from 'ui/registry/chrome_header_nav_controls';
 import { relativeToAbsolute } from 'ui/url/relative_to_absolute';
 
-import Navbar from '@logrhythm/nm-web-shared/components/navigation/navbar/navbar';
+import { Navbar } from '@logrhythm/nm-web-shared';
 
 import { NavControlSide } from '../';
 import { ChromeBadge, ChromeBreadcrumb, ChromeNavLink } from '../../../../../../../core/public';
