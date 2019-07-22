@@ -60,7 +60,6 @@ import { relativeToAbsolute } from 'ui/url/relative_to_absolute';
 
 import { Navbar } from '@logrhythm/nm-web-shared';
 
-import { NavControlSide } from '../';
 import { ChromeBadge, ChromeBreadcrumb, ChromeNavLink } from '../../../../../../../core/public';
 
 import 'tether';
