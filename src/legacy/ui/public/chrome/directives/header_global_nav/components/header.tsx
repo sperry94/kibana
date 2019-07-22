@@ -214,23 +214,12 @@ class HeaderUI extends Component<Props, State> {
   }
 
   public render() {
-    const {
-      appTitle,
-      badge$,
-      breadcrumbs$,
-      isVisible,
-      navControls,
-      helpExtension$,
-      intl,
-    } = this.props;
+    const { isVisible, intl } = this.props;
     const { navLinks, recentlyAccessed } = this.state;
 
     if (!isVisible) {
       return null;
     }
-
-    const leftNavControls = navControls.bySide[NavControlSide.Left];
-    const rightNavControls = navControls.bySide[NavControlSide.Right];
 
     const navLinksArray = navLinks
       .filter(navLink => !navLink.hidden)
