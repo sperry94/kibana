@@ -58,13 +58,12 @@ import { RecentlyAccessedHistoryItem } from 'ui/persisted_log';
 import { ChromeHeaderNavControlsRegistry } from 'ui/registry/chrome_header_nav_controls';
 import { relativeToAbsolute } from 'ui/url/relative_to_absolute';
 
-import { HeaderBadge } from './header_badge';
-import { HeaderBreadcrumbs } from './header_breadcrumbs';
-import { HeaderHelpMenu } from './header_help_menu';
-import { HeaderNavControls } from './header_nav_controls';
+import { Navbar } from '@logrhythm/nm-web-shared';
 
-import { NavControlSide } from '../';
 import { ChromeBadge, ChromeBreadcrumb, ChromeNavLink } from '../../../../../../../core/public';
+
+import 'tether';
+import 'bootstrap';
 
 interface Props {
   appTitle?: string;
@@ -214,23 +213,12 @@ class HeaderUI extends Component<Props, State> {
   }
 
   public render() {
-    const {
-      appTitle,
-      badge$,
-      breadcrumbs$,
-      isVisible,
-      navControls,
-      helpExtension$,
-      intl,
-    } = this.props;
+    const { isVisible, intl } = this.props;
     const { navLinks, recentlyAccessed } = this.state;
 
     if (!isVisible) {
       return null;
     }
-
-    const leftNavControls = navControls.bySide[NavControlSide.Left];
-    const rightNavControls = navControls.bySide[NavControlSide.Right];
 
     const navLinksArray = navLinks
       .filter(navLink => !navLink.hidden)
@@ -281,29 +269,7 @@ class HeaderUI extends Component<Props, State> {
 
     return (
       <Fragment>
-        <EuiHeader>
-          <EuiHeaderSection grow={false}>
-            <EuiShowFor sizes={['xs', 's']}>
-              <EuiHeaderSectionItem border="right">{this.renderMenuTrigger()}</EuiHeaderSectionItem>
-            </EuiShowFor>
-
-            <EuiHeaderSectionItem border="right">{this.renderLogo()}</EuiHeaderSectionItem>
-
-            <HeaderNavControls navControls={leftNavControls} />
-          </EuiHeaderSection>
-
-          <HeaderBreadcrumbs appTitle={appTitle} breadcrumbs$={breadcrumbs$} />
-
-          <HeaderBadge badge$={badge$} />
-
-          <EuiHeaderSection side="right">
-            <EuiHeaderSectionItem>
-              <HeaderHelpMenu helpExtension$={helpExtension$} />
-            </EuiHeaderSectionItem>
-
-            <HeaderNavControls navControls={rightNavControls} />
-          </EuiHeaderSection>
-        </EuiHeader>
+        <Navbar />
 
         <EuiNavDrawer ref={this.navDrawerRef} data-test-subj="navDrawer">
           <EuiNavDrawerGroup listItems={recentLinksArray} />
