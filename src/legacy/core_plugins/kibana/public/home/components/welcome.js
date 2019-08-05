@@ -31,7 +31,6 @@ import {
   EuiSpacer,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiText,
   EuiIcon,
   EuiButton,
   EuiButtonEmpty,
@@ -72,14 +71,9 @@ export class Welcome extends React.Component {
               </span>
               <EuiTitle size="l" className="homWelcome__title">
                 <h1>
-                  <FormattedMessage id="kbn.home.welcomeTitle" defaultMessage="Welcome to Kibana"/>
+                  <FormattedMessage id="kbn.home.welcomeTitle" defaultMessage="Welcome to NetMon"/>
                 </h1>
               </EuiTitle>
-              <EuiText size="s" color="subdued" className="homWelcome__subtitle">
-                <p>
-                  <FormattedMessage id="kbn.home.welcomeDescription" defaultMessage="Your window into the Elastic Stack"/>
-                </p>
-              </EuiText>
               <EuiSpacer size="xl" />
             </div>
           </header>

@@ -449,7 +449,7 @@ export class FieldEditorComponent extends PureComponent {
         intl.formatMessage({
           id: 'common.ui.fieldEditor.popularityLabel',
           defaultMessage: 'Popularity',
-          description: '"Popularity" refers to Kibana\'s measurement how popular a field is (i.e. how commonly it is used).',
+          description: '"Popularity" refers to NetMon-UI\'s measurement how popular a field is (i.e. how commonly it is used).',
         })
       }
       >
