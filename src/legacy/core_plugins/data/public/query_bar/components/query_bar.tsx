@@ -41,6 +41,8 @@ import { QueryBarInput } from './query_bar_input';
 
 import { getQueryLog } from '../lib/get_query_log';
 
+import { SaveRule } from '../../../../../../netmon/components/save_rule';
+
 const config = chrome.getUiSettingsClient();
 
 interface Query {
@@ -245,6 +247,8 @@ export class QueryBarUI extends Component<Props, State> {
       'kbnQueryBar--withDatePicker': this.props.showDatePicker,
     });
 
+    const currentQuery = this.state.query && this.state.query.query ? this.state.query.query : '';
+
     return (
       <EuiFlexGroup className={classes} responsive={!!this.props.showDatePicker} gutterSize="s">
         <EuiFlexItem>
@@ -262,6 +266,9 @@ export class QueryBarUI extends Component<Props, State> {
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>{this.renderUpdateButton()}</EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <SaveRule query={currentQuery} />
+        </EuiFlexItem>
       </EuiFlexGroup>
     );
   }
@@ -382,6 +389,12 @@ export class QueryBarUI extends Component<Props, State> {
     this.props.store.set('kibana.luceneSyntaxWarningOptOut', true);
     toastNotifications.remove(toast);
   }
+
+  private handleSaveQueryRule = () => {
+    const query = this.state.query && this.state.query.query ? this.state.query.query : '';
+
+    alert('saving:' + query);
+  };
 }
 
 // @ts-ignore
