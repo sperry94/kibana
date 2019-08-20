@@ -389,12 +389,6 @@ export class QueryBarUI extends Component<Props, State> {
     this.props.store.set('kibana.luceneSyntaxWarningOptOut', true);
     toastNotifications.remove(toast);
   }
-
-  private handleSaveQueryRule = () => {
-    const query = this.state.query && this.state.query.query ? this.state.query.query : '';
-
-    alert('saving:' + query);
-  };
 }
 
 // @ts-ignore
