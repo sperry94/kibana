@@ -51,7 +51,7 @@ export function IndexPatternsProvider(Private, config) {
   };
 
   self.make = function (id) {
-    return (new IndexPattern(id)).init();
+    return (new IndexPattern(id)).init(true);
   };
 
   self.delete = function (pattern) {
