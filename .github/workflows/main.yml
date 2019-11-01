@@ -18,7 +18,7 @@ jobs:
               npm config set registry ${{ secrets.NPM_REGISTRY }} &&
               npm config set _auth ${{ secrets.NPM_TOKEN }} &&
               npm config set always-auth true &&
-              npm i ${{ github.event.client_payload.version }}
+              yarn install --ignore-engines ${{ github.event.client_payload.version }}
          - name: Push changes
            run: |
               git config user.email '<>' &&
