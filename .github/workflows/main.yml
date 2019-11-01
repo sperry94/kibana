@@ -1,0 +1,28 @@
+name: Update nm-web-shared
+
+on: [repository_dispatch]
+
+jobs:
+   update_package:
+      runs-on: ubuntu-latest
+      if: github.event.client_payload.branch && github.event.client_payload.version
+
+      steps:
+         - uses: actions/checkout@v1
+           with:
+              ref: ${{ github.event.client_payload.branch }}
+         - name: Install new version
+           env:
+              CYPRESS_INSTALL_BINARY: 0
+           run: |
+              npm config set registry ${{ secrets.NPM_REGISTRY }} &&
+              npm config set _auth ${{ secrets.NPM_TOKEN }} &&
+              npm config set always-auth true &&
+              npm i ${{ github.event.client_payload.version }}
+         - name: Push changes
+           run: |
+              git config user.email '<>' &&
+              git config user.name 'Netmon Robot' &&
+              git remote set-url origin "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git" &&
+              git commit -am "Upgrading to version ${{ github.event.client_payload.version }}" &&
+              git push --set-upstream origin ${{ github.event.client_payload.branch }}
