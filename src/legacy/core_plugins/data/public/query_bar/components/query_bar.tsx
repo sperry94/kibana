@@ -321,7 +321,10 @@ export class QueryBarUI extends Component<Props, State> {
         </EuiFlexItem>
         <EuiFlexItem grow={false}>{this.renderUpdateButton()}</EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <SaveRule query={currentQuery} />
+          <SaveRule
+            query={currentQuery}
+            disabledForLanguage={this.props.query.language !== 'lucene'}
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
     );
